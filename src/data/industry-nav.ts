@@ -22,16 +22,66 @@ export type IndustryNavLink = {
 };
 
 const navMeta: { slug: string; name: string; icon: LucideIcon; description?: string }[] = [
-  { slug: "hrms-for-fintech", name: "Fintech", icon: Coins },
-  { slug: "hrms-for-healthcare", name: "Healthcare", icon: HeartPulse },
-  { slug: "hrms-for-it-services", name: "IT & Software", icon: Laptop },
-  { slug: "hrms-for-retail", name: "Retail", icon: ShoppingBag },
-  { slug: "hrms-for-hospitality", name: "Hospitality", icon: UtensilsCrossed },
-  { slug: "hrms-for-manufacturing", name: "Manufacturing", icon: Factory },
-  { slug: "hrms-for-education", name: "Education", icon: GraduationCap },
-  { slug: "hrms-for-logistics", name: "Logistics", icon: Truck },
-  { slug: "hrms-for-real-estate", name: "Real Estate", icon: Building2 },
-  { slug: "hrms-for-bfsi", name: "Banking & BFSI", icon: Landmark },
+  {
+    slug: "hrms-for-fintech",
+    name: "Fintech",
+    icon: Coins,
+    description: "Fintech payroll and onboarding.",
+  },
+  {
+    slug: "hrms-for-healthcare",
+    name: "Healthcare",
+    icon: HeartPulse,
+    description: "Staffing and compliance.",
+  },
+  {
+    slug: "hrms-for-it-services",
+    name: "IT & Software",
+    icon: Laptop,
+    description: "IT performance and payroll.",
+  },
+  {
+    slug: "hrms-for-retail",
+    name: "Retail",
+    icon: ShoppingBag,
+    description: "Retail attendance and payroll.",
+  },
+  {
+    slug: "hrms-for-hospitality",
+    name: "Hospitality",
+    icon: UtensilsCrossed,
+    description: "Hospitality shifts and payroll.",
+  },
+  {
+    slug: "hrms-for-manufacturing",
+    name: "Manufacturing",
+    icon: Factory,
+    description: "Factory shifts and compliance.",
+  },
+  {
+    slug: "hrms-for-education",
+    name: "Education",
+    icon: GraduationCap,
+    description: "Education attendance and payroll.",
+  },
+  {
+    slug: "hrms-for-logistics",
+    name: "Logistics",
+    icon: Truck,
+    description: "Driver shifts and payroll.",
+  },
+  {
+    slug: "hrms-for-real-estate",
+    name: "Real Estate",
+    icon: Building2,
+    description: "Commission payroll and HR.",
+  },
+  {
+    slug: "hrms-for-bfsi",
+    name: "Banking & BFSI",
+    icon: Landmark,
+    description: "BFSI HR and compliance.",
+  },
 ];
 
 export const INDUSTRY_NAV_LINKS: IndustryNavLink[] = navMeta
@@ -42,7 +92,7 @@ export const INDUSTRY_NAV_LINKS: IndustryNavLink[] = navMeta
       name: item.name,
       href: page.path,
       icon: item.icon,
-      description: item.description ?? page.subtitle.slice(0, 72) + (page.subtitle.length > 72 ? "…" : ""),
+      description: item.description ?? page.subtitle,
     };
   });
 
@@ -50,5 +100,5 @@ export const INDUSTRY_NAV_VIEW_ALL: IndustryNavLink = {
   name: "All industries",
   href: "/industries",
   icon: LayoutGrid,
-  description: "Browse every industry HRMS solution from OfficeKit HR.",
+  description: "Browse industry HRMS solutions.",
 };

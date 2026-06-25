@@ -20,6 +20,7 @@ const LongtailHub = () => (
         eyebrow="HR Knowledge Base"
         title="HR & payroll guides"
         subtitle="Practical guides for HR leaders evaluating HRMS, payroll software, and compliance solutions."
+        className="pt-40 sm:pt-44 md:pt-48"
       />
 
       <main className="container mx-auto px-4 max-w-4xl py-12 md:py-16">

@@ -116,6 +116,7 @@ const Pricing = () => {
 
         <SeoHeroBanner
           overlayClassName="from-background/97 via-background/95 to-background"
+          className="pt-40 sm:pt-44 md:pt-48"
           title={
             <>
               Flexible HRMS pricing for{" "}

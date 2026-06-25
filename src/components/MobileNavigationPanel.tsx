@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, X, type LucideIcon } from "lucide-react";
+import { ChevronDown, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export type MobileNavLink = {
@@ -34,17 +34,6 @@ function MobileNavigationPanel({
 }: MobileNavigationPanelProps) {
   return (
     <div data-mobile-menu className="flex h-full w-full flex-col">
-      <div className="mb-4 flex justify-end">
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-lg p-2 hover:bg-blue-50"
-          aria-label="Close menu"
-        >
-          <X className="h-6 w-6 text-gray-700" />
-        </button>
-      </div>
-
       <div className="w-full space-y-1">
         <button
           type="button"

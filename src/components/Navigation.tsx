@@ -146,7 +146,6 @@ const Navigation = () => {
     };
   }, []);
 
-
   // Custom Logo Component
   const NavbarLogo = () => (
     <Link
@@ -168,7 +167,7 @@ const Navigation = () => {
       >
       {/* Desktop Navigation — not mounted on mobile (saves Radix + heavy DOM) */}
       {isDesktopNav ? (
-      <NavBody>
+      <NavBody className="overflow-visible">
         <NavbarLogo />
         
         {/* Desktop Navigation Items with Dropdowns */}
@@ -203,12 +202,12 @@ const Navigation = () => {
               <DropdownMenuContent
                 onMouseEnter={handleFeaturesMouseEnter}
                 onMouseLeave={handleFeaturesMouseLeave}
-              className="w-[95vw] max-w-[920px] bg-white rounded-2xl shadow-xl border border-gray-100 mt-2 p-3 md:p-4 z-[70]"
+              className="w-[92vw] max-w-[880px] bg-white rounded-2xl shadow-xl border border-gray-100 mt-2 p-3 md:p-4 z-[70]"
               align="start"
               sideOffset={8}
               onCloseAutoFocus={(e) => e.preventDefault()}
               side="bottom"
-              alignOffset={-20}
+              alignOffset={-32}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
                 {FEATURE_NAV_LINKS.map((link) => (
@@ -224,7 +223,7 @@ const Navigation = () => {
                       <h3 className="font-medium text-sm text-gray-900 group-hover:text-[#0055ff] transition-colors duration-200 mb-0.5">
                         {link.name}
                       </h3>
-                      <p className="text-xs text-gray-600 transition-colors duration-200">
+                      <p className="truncate text-xs text-gray-600 transition-colors duration-200">
                         {link.description}
                       </p>
                     </div>
@@ -236,82 +235,64 @@ const Navigation = () => {
           </DropdownMenu>
 
           {/* Industries Dropdown */}
-          <DropdownMenu
-            modal={false}
-            open={industriesOpen}
-            onOpenChange={setIndustriesOpen}
+          <div
+            onMouseEnter={handleIndustriesMouseEnter}
+            onMouseLeave={handleIndustriesMouseLeave}
+            className="pointer-events-auto relative"
           >
-            <div
-              onMouseEnter={handleIndustriesMouseEnter}
-              onMouseLeave={handleIndustriesMouseLeave}
-              className="pointer-events-auto"
+            <button
+              className="nav-menu-trigger gap-1 px-2 sm:px-2.5 md:px-3 lg:px-3 xl:px-4 py-2 text-sm lg:text-base font-medium whitespace-nowrap"
+              aria-label="Industries menu"
+              aria-expanded={industriesOpen}
+              aria-haspopup="true"
             >
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="nav-menu-trigger gap-1 px-2 sm:px-2.5 md:px-3 lg:px-3 xl:px-4 py-2 text-sm lg:text-base font-medium whitespace-nowrap"
-                  aria-label="Industries menu"
-                  aria-expanded={industriesOpen}
-                  aria-haspopup="true"
-                >
-                  <span>Industries</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${industriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                </button>
-              </DropdownMenuTrigger>
-            </div>
-            <div
-              onMouseEnter={handleIndustriesMouseEnter}
-              onMouseLeave={handleIndustriesMouseLeave}
-            >
-              <DropdownMenuContent
-                onMouseEnter={handleIndustriesMouseEnter}
-                onMouseLeave={handleIndustriesMouseLeave}
-              className="w-[95vw] max-w-[920px] bg-white rounded-2xl shadow-xl border border-gray-100 mt-2 p-3 md:p-4 z-[70]"
-              align="start"
-              sideOffset={8}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-              side="bottom"
-              alignOffset={-20}
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
-                {INDUSTRY_NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className="flex items-start gap-2.5 p-2.5 rounded-lg transition-all duration-200 hover:bg-blue-50 hover:shadow-sm group cursor-pointer"
-                  >
-                    <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-gray-100 group-hover:bg-[#0055ff] flex items-center justify-center transition-all duration-200">
-                      <link.icon className="h-4 w-4 text-[#0055ff] group-hover:text-white transition-colors duration-200" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-sm text-gray-900 group-hover:text-[#0055ff] transition-colors duration-200 mb-0.5">
-                        {link.name}
-                      </h3>
-                      <p className="text-xs text-gray-600 transition-colors duration-200">
-                        {link.description}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-                <Link
-                  to={INDUSTRY_NAV_VIEW_ALL.href}
-                  className="flex items-start gap-2.5 p-2.5 rounded-lg transition-all duration-200 hover:bg-blue-50 hover:shadow-sm group cursor-pointer sm:col-span-2 lg:col-span-3 border border-dashed border-gray-200"
-                >
-                  <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-gray-100 group-hover:bg-[#0055ff] flex items-center justify-center transition-all duration-200">
-                    <INDUSTRY_NAV_VIEW_ALL.icon className="h-4 w-4 text-[#0055ff] group-hover:text-white transition-colors duration-200" />
+              <span>Industries</span>
+              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${industriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+            </button>
+            {industriesOpen ? (
+              <div className="pointer-events-auto absolute top-[calc(100%+14px)] right-[-630px] z-[70] w-[86vw] max-w-[min(780px,calc(100vw-96px))]">
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-3 md:p-4">
+                  <div className="grid grid-cols-3 gap-y-2.5 md:gap-y-3 gap-x-0.5 md:gap-x-1">
+                    {INDUSTRY_NAV_LINKS.map((link) => (
+                      <Link
+                        key={link.href}
+                        to={link.href}
+                        className="flex items-start gap-2.5 p-2.5 rounded-lg transition-all duration-200 hover:bg-blue-50 hover:shadow-sm group cursor-pointer"
+                      >
+                        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-gray-100 group-hover:bg-[#0055ff] flex items-center justify-center transition-all duration-200">
+                          <link.icon className="h-4 w-4 text-[#0055ff] group-hover:text-white transition-colors duration-200" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm text-gray-900 group-hover:text-[#0055ff] transition-colors duration-200 mb-0.5">
+                            {link.name}
+                          </h3>
+                          <p className="text-xs text-gray-600 transition-colors duration-200">
+                            {link.description}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                    <Link
+                      to={INDUSTRY_NAV_VIEW_ALL.href}
+                      className="flex items-start gap-2.5 p-2.5 rounded-lg transition-all duration-200 hover:bg-blue-50 hover:shadow-sm group cursor-pointer"
+                    >
+                      <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#0055ff] flex items-center justify-center transition-all duration-200">
+                        <INDUSTRY_NAV_VIEW_ALL.icon className="h-4 w-4 text-white transition-colors duration-200" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm text-gray-900 group-hover:text-[#0055ff] transition-colors duration-200 mb-0.5">
+                          {INDUSTRY_NAV_VIEW_ALL.name}
+                        </h3>
+                        <p className="truncate text-xs font-medium text-gray-700 transition-colors duration-200">
+                          {INDUSTRY_NAV_VIEW_ALL.description}
+                        </p>
+                      </div>
+                    </Link>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-sm text-gray-900 group-hover:text-[#0055ff] transition-colors duration-200 mb-0.5">
-                      {INDUSTRY_NAV_VIEW_ALL.name}
-                    </h3>
-                    <p className="text-xs text-gray-600 transition-colors duration-200">
-                      {INDUSTRY_NAV_VIEW_ALL.description}
-                    </p>
-                  </div>
-                </Link>
+                </div>
               </div>
-            </DropdownMenuContent>
-            </div>
-          </DropdownMenu>
+            ) : null}
+          </div>
 
           {/* Resources Dropdown */}
           <DropdownMenu 
@@ -467,7 +448,7 @@ const Navigation = () => {
         </MobileNavMenu>
       </MobileNav>
       ) : null}
-    </Navbar>
+      </Navbar>
     </>
   );
 };

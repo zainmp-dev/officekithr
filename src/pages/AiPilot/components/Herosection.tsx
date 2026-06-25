@@ -31,7 +31,7 @@ const HeroSection = () => {
 
   return (
     <section
-      className="min-h-screen relative overflow-hidden"
+      className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-0"
       style={{
         background: "linear-gradient(180deg, #101443 63.68%, #000328 100%)",
       }}
@@ -47,8 +47,8 @@ const HeroSection = () => {
         ></div>
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center min-h-[calc(100vh-8rem)] sm:min-h-[calc(100vh-9rem)] lg:min-h-screen">
           {/* Left Content */}
           <div className="space-y-8 text-center lg:text-left">
             <div className="space-y-6">

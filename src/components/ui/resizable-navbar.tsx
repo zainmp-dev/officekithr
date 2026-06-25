@@ -200,7 +200,7 @@ export const MobileNavMenu = ({
         aria-hidden={!isOpen}
       >
         {hasMounted ? (
-          <div className="flex h-full flex-col overflow-y-auto overscroll-contain px-4 py-6 [-webkit-overflow-scrolling:touch]">
+          <div className="flex h-full flex-col overflow-y-auto overscroll-contain px-4 pt-16 pb-6 [-webkit-overflow-scrolling:touch]">
             {children}
           </div>
         ) : null}
@@ -223,7 +223,10 @@ export const MobileNavToggle = ({
         e.stopPropagation();
         onClick();
       }}
-      className="relative z-[60] rounded-lg p-2.5 min-w-11 min-h-11 transition-colors duration-150 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0055ff] focus-visible:ring-offset-1 dark:hover:bg-neutral-800 touch-manipulation"
+      className={cn(
+        "relative z-[60] rounded-lg p-2.5 min-w-11 min-h-11 transition-colors duration-150 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0055ff] focus-visible:ring-offset-1 dark:hover:bg-neutral-800 touch-manipulation",
+        isOpen ? "mr-3" : ""
+      )}
       aria-label={isOpen ? "Close menu" : "Open menu"}
       aria-expanded={isOpen}
     >
@@ -236,19 +239,19 @@ export const MobileNavToggle = ({
       >
         <span
           className={cn(
-            "block h-0.5 w-full origin-center bg-black transition-transform duration-150 dark:bg-white",
+            "block h-0.5 w-full origin-center bg-gray-600 transition-transform duration-150 dark:bg-gray-300",
             isOpen && "translate-y-[9px] rotate-45"
           )}
         />
         <span
           className={cn(
-            "block h-0.5 w-full bg-black transition-opacity duration-150 dark:bg-white",
+            "block h-0.5 w-full bg-gray-600 transition-opacity duration-150 dark:bg-gray-300",
             isOpen && "opacity-0"
           )}
         />
         <span
           className={cn(
-            "block h-0.5 w-full origin-center bg-black transition-transform duration-150 dark:bg-white",
+            "block h-0.5 w-full origin-center bg-gray-600 transition-transform duration-150 dark:bg-gray-300",
             isOpen && "-translate-y-[9px] -rotate-45"
           )}
         />

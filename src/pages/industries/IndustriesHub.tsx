@@ -52,6 +52,7 @@ const IndustriesHub = () => (
         eyebrow="Industry solutions"
         title="HRMS built for your industry"
         subtitle="Purpose-built workforce management for fintech, healthcare, IT, retail, and more — with India and GCC statutory payroll."
+        className="pt-40 sm:pt-44 md:pt-48"
       >
         <Button asChild className="btn-cta h-11 group">
           <Link to="/contact">

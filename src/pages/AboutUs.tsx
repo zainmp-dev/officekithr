@@ -94,7 +94,7 @@ const AboutUs = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 bg-gradient-subtle bg-cover bg-center"
+      <section className="pt-40 sm:pt-44 md:pt-48 pb-20 bg-gradient-subtle bg-cover bg-center"
         style={{
           backgroundImage: "url('/RecruitmentManagement2.jpg')",
         }}

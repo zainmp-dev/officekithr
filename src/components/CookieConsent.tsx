@@ -44,7 +44,7 @@ export function CookieConsent() {
       aria-describedby="cookie-consent-desc"
       className="fixed left-0 right-0 z-[200] p-3 sm:p-4 md:p-6 bottom-[max(4.5rem,env(safe-area-inset-bottom))] sm:bottom-0 sm:pb-[max(1rem,env(safe-area-inset-bottom))]"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl border border-border bg-background/98 p-4 shadow-lg backdrop-blur-sm sm:gap-4 sm:p-5 md:flex-row md:items-center md:p-6">
+      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl border border-border bg-white p-4 shadow-lg sm:gap-4 sm:p-5 md:flex-row md:items-center md:p-6">
         <div className="min-w-0 flex-1">
           <p id="cookie-consent-title" className="text-sm font-semibold text-foreground sm:text-base">
             Cookie preferences

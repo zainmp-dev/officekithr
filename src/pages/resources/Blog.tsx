@@ -74,7 +74,7 @@ const Blog = () => {
       <Navigation />
 
       <section
-        className="relative pt-[5.5rem] sm:pt-28 lg:pt-32 pb-8 sm:pb-10 overflow-hidden"
+        className="relative pt-40 sm:pt-44 md:pt-48 pb-8 sm:pb-10 overflow-hidden"
         aria-labelledby="blog-hero-heading"
       >
         <div
@@ -101,7 +101,7 @@ const Blog = () => {
             </p>
 
             <div className="relative -mx-4 sm:mx-0">
-              <div className="flex sm:flex-wrap sm:justify-center gap-2 overflow-x-auto px-4 sm:px-0 pb-2 sm:pb-0 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex sm:flex-wrap sm:justify-center gap-2 overflow-x-auto pl-5 pr-4 sm:px-0 pb-2 sm:pb-0 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {BLOG_CATEGORIES.map((cat) => (
                   <Button
                     key={cat.label}

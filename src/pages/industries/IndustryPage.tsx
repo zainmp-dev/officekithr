@@ -41,6 +41,7 @@ const IndustryPage = () => {
           eyebrow="OfficeKit HR Industry Solutions"
           title={page.h1}
           subtitle={page.subtitle}
+          className="pt-40 sm:pt-44 md:pt-48"
         >
           <Button asChild className="btn-cta h-11 group">
             <Link to="/contact">

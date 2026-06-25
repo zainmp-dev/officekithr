@@ -46,6 +46,7 @@ const LongtailPage = () => {
           eyebrow="HR Knowledge Base"
           title={page.h1}
           subtitle={page.subtitle}
+          className="pt-40 sm:pt-44 md:pt-48"
         />
 
         <div className="container mx-auto px-4 max-w-4xl py-12">
