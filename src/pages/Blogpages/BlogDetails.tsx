@@ -17,6 +17,7 @@ import { absoluteUrl, SITE } from "@/seo/site-config";
 import BlogActions from "@/components/BlogActions";
 import BackToBlog from "@/components/BackToBlog";
 import { formatBlogDate } from "@/utils/formatBlogDate";
+import { prepareBlogContentHtml } from "@/utils/prepareBlogContent";
 import { BlogPost } from "@/types";
 
 /** Clears fixed announcement bar + floating nav (see Navigation.tsx). */
@@ -210,10 +211,10 @@ export default function BlogDetail() {
   }
 
   const sanitizedContent = DOMPurify.sanitize(post.content || "");
-  const cleanedContent = sanitizedContent
-    .replace(/<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
-    .replace(/(?:<br\s*\/?>\s*){3,}/gi, "<br /><br />")
-    .trim();
+  const cleanedContent = prepareBlogContentHtml(sanitizedContent, {
+    title: post.title,
+    featuredImage: post.image || SITE.ogImage,
+  });
 
   const hasHtmlContent = cleanedContent.length > 0;
   const fallbackText = excerpt;

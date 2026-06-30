@@ -1,6 +1,7 @@
 import { env } from "@/lib/env";
 import {
   FLOWPILOT_BLOG_PAGE_SIZE,
+  flowpilotBlogDetailUrl,
   flowpilotBlogHeaders,
   flowpilotBlogUrl,
 } from "@/lib/flowpilot-blog-api";
@@ -29,6 +30,11 @@ interface FlowPilotBlogsResponse {
     totalPages: number;
     totalBlogs: number;
   };
+}
+
+interface FlowPilotBlogDetailResponse {
+  success: boolean;
+  data: FlowPilotBlog;
 }
 
 let postsCache: BlogPost[] | null = null;
@@ -82,6 +88,11 @@ function slugForPost(post: BlogPost): string {
   );
 }
 
+function patchCachedPost(updated: BlogPost): void {
+  if (!postsCache) return;
+  postsCache = postsCache.map((p) => (p._id === updated._id ? updated : p));
+}
+
 async function fetchPublishedBlogsPage(page: number): Promise<FlowPilotBlogsResponse | null> {
   const url = flowpilotBlogUrl(env.blogApiUrl, {
     page,
@@ -112,6 +123,25 @@ async function fetchFlowPilotBlogs(): Promise<BlogPost[]> {
   }
 
   return posts;
+}
+
+/** Fetch one blog with full HTML body (list API returns empty content). */
+async function fetchBlogById(blogId: string): Promise<BlogPost | null> {
+  const url = flowpilotBlogDetailUrl(env.blogApiUrl, blogId);
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: flowpilotBlogHeaders(env.blogApiKey),
+  });
+
+  if (!res.ok) return null;
+
+  const body = (await res.json()) as FlowPilotBlogDetailResponse;
+  if (!body?.success || !body.data) return null;
+
+  const post = mapFlowPilotBlog(body.data);
+  patchCachedPost(post);
+  return post;
 }
 
 /** Synchronous read of the in-memory API cache (empty until first fetch completes). */
@@ -156,8 +186,17 @@ export function prefetchAllPosts(): Promise<BlogPost[]> {
 
 export const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
   const cached = getCachedPostBySlug(slug);
-  if (cached?.content) return cached;
+  if (cached?.content?.trim()) return cached;
 
-  const posts = await getAllPosts();
-  return posts.find((p) => slugForPost(p) === slug) ?? null;
+  let stub = cached;
+  if (!stub) {
+    const posts = await getAllPosts();
+    stub = posts.find((p) => slugForPost(p) === slug) ?? null;
+  }
+
+  if (!stub) return null;
+  if (stub.content?.trim()) return stub;
+
+  const fullPost = await fetchBlogById(stub._id);
+  return fullPost ?? stub;
 };

@@ -38,6 +38,12 @@ export function flowpilotBlogUrl(baseUrl, { page = 1, limit = FLOWPILOT_BLOG_PAG
   return url.toString();
 }
 
+/** Single blog — list endpoint omits `content`; detail returns full HTML body. */
+export function flowpilotBlogDetailUrl(baseUrl, blogId) {
+  const root = baseUrl.split("?")[0].replace(/\/$/, "");
+  return `${root}/${encodeURIComponent(blogId)}`;
+}
+
 /** Fetch all published blog pages from FlowPilot. */
 export async function fetchAllPublishedBlogs({ apiUrl, apiKey } = {}) {
   const base = resolveFlowpilotBlogBaseUrl(

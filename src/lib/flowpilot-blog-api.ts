@@ -55,3 +55,9 @@ export function flowpilotBlogUrl(
   url.searchParams.set("status", status);
   return url.toString();
 }
+
+/** Single blog — list endpoint omits `content`; detail returns full HTML body. */
+export function flowpilotBlogDetailUrl(baseUrl: string, blogId: string): string {
+  const root = baseUrl.split("?")[0].replace(/\/$/, "");
+  return `${root}/${encodeURIComponent(blogId)}`;
+}
