@@ -12,9 +12,10 @@ const BackToBlog = ({ className = "" }: BackToBlogProps) => {
     <Link
       to={BACK_TO_BLOG_PATH}
       className={[
-        "inline-flex items-center gap-2 rounded-lg border border-border/70 bg-background px-3 py-2",
-        "text-sm font-medium text-foreground shadow-sm",
-        "transition-colors hover:bg-muted/60 hover:text-primary",
+        "inline-flex w-full sm:w-auto items-center justify-center sm:justify-start gap-2",
+        "rounded-lg border border-primary/25 bg-primary/5 px-3 py-2",
+        "text-sm font-semibold text-primary",
+        "transition-colors hover:bg-primary/10 hover:border-primary/40",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
         className,
       ].join(" ")}
