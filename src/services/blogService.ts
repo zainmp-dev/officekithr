@@ -1,9 +1,10 @@
-import axios from "axios";
 import { env } from "@/lib/env";
+import {
+  FLOWPILOT_BLOG_PAGE_SIZE,
+  flowpilotBlogHeaders,
+  flowpilotBlogUrl,
+} from "@/lib/flowpilot-blog-api";
 import { BlogPost } from "../types";
-
-const API_URL = env.blogApiUrl;
-const API_KEY = env.blogApiKey;
 
 interface FlowPilotBlog {
   id: string;
@@ -32,6 +33,7 @@ interface FlowPilotBlogsResponse {
 
 let postsCache: BlogPost[] | null = null;
 let cacheTime = 0;
+let inflightFetch: Promise<BlogPost[]> | null = null;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 function stripHtml(html: string): string {
@@ -67,19 +69,59 @@ function mapFlowPilotBlog(blog: FlowPilotBlog): BlogPost {
   };
 }
 
-function authHeaders(): Record<string, string> {
-  if (!API_KEY) return {};
-  return { Authorization: `Bearer ${API_KEY}` };
+function slugForPost(post: BlogPost): string {
+  return (
+    post.slug ||
+    (post.title
+      ? post.title
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/\s+/g, "-")
+      : "")
+  );
+}
+
+async function fetchPublishedBlogsPage(page: number): Promise<FlowPilotBlogsResponse | null> {
+  const url = flowpilotBlogUrl(env.blogApiUrl, {
+    page,
+    limit: FLOWPILOT_BLOG_PAGE_SIZE,
+  });
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: flowpilotBlogHeaders(env.blogApiKey),
+  });
+
+  if (!res.ok) return null;
+  return res.json() as Promise<FlowPilotBlogsResponse>;
 }
 
 async function fetchFlowPilotBlogs(): Promise<BlogPost[]> {
-  const res = await axios.get<FlowPilotBlogsResponse>(API_URL, {
-    params: { page: 1, limit: 50, status: "published" },
-    headers: authHeaders(),
-  });
+  const posts: BlogPost[] = [];
+  let page = 1;
+  let totalPages = 1;
 
-  if (!res.data?.success || !res.data.data?.blogs) return [];
-  return res.data.data.blogs.map(mapFlowPilotBlog);
+  while (page <= totalPages) {
+    const body = await fetchPublishedBlogsPage(page);
+    if (!body?.success || !body.data?.blogs) break;
+
+    posts.push(...body.data.blogs.map(mapFlowPilotBlog));
+    totalPages = body.data.totalPages || 1;
+    page += 1;
+  }
+
+  return posts;
+}
+
+/** Synchronous read of the in-memory API cache (empty until first fetch completes). */
+export function getCachedPosts(): BlogPost[] {
+  return postsCache ?? [];
+}
+
+/** Find a post in cache without triggering a network request. */
+export function getCachedPostBySlug(slug: string): BlogPost | null {
+  return getCachedPosts().find((p) => slugForPost(p) === slug) ?? null;
 }
 
 export const getAllPosts = async (): Promise<BlogPost[]> => {
@@ -88,29 +130,34 @@ export const getAllPosts = async (): Promise<BlogPost[]> => {
     return postsCache;
   }
 
-  try {
-    postsCache = await fetchFlowPilotBlogs();
-    cacheTime = now;
-    return postsCache;
-  } catch {
-    return postsCache ?? [];
+  if (inflightFetch) {
+    return inflightFetch;
   }
+
+  inflightFetch = (async () => {
+    try {
+      postsCache = await fetchFlowPilotBlogs();
+      cacheTime = Date.now();
+      return postsCache;
+    } catch {
+      return postsCache ?? [];
+    } finally {
+      inflightFetch = null;
+    }
+  })();
+
+  return inflightFetch;
 };
 
+/** Warm the cache in the background; safe to call multiple times. */
+export function prefetchAllPosts(): Promise<BlogPost[]> {
+  return getAllPosts();
+}
+
 export const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
+  const cached = getCachedPostBySlug(slug);
+  if (cached?.content) return cached;
+
   const posts = await getAllPosts();
-  return (
-    posts.find((p) => {
-      const postSlug =
-        p.slug ||
-        (p.title
-          ? p.title
-              .toLowerCase()
-              .trim()
-              .replace(/[^\w\s-]/g, "")
-              .replace(/\s+/g, "-")
-          : "");
-      return postSlug === slug;
-    }) ?? null
-  );
+  return posts.find((p) => slugForPost(p) === slug) ?? null;
 };

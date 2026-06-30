@@ -116,12 +116,17 @@ export default {
           "0%": { transform: "scale(1)", opacity: "0.55" },
           "100%": { transform: "scale(2.4)", opacity: "0" },
         },
+        "announcement-marquee": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "live-pulse": "live-pulse 1.4s ease-in-out infinite",
         "live-ring": "live-ring 1.4s ease-out infinite",
+        "announcement-marquee": "announcement-marquee 32s linear infinite",
       },
     },
   },

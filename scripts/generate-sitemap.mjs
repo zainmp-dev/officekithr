@@ -5,6 +5,7 @@
 import { writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { fetchAllPublishedBlogs } from "./lib/flowpilot-blog-api.mjs";
 import { loadViteEnv } from "./load-env.mjs";
 import { EXTRA_SEO_PATHS } from "./seo-extra-paths.mjs";
 
@@ -247,23 +248,11 @@ function excerptFrom(html, max = 160) {
 }
 
 async function fetchDynamicBlogs() {
-  const apiUrl =
-    process.env.VITE_BLOG_API_URL ||
-    "https://flowpilot.officekithr.net/api/api/blogs";
-  const apiKey = process.env.VITE_BLOG_API_KEY?.trim();
-
   try {
-    const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
-    const url = new URL(apiUrl);
-    url.searchParams.set("page", "1");
-    url.searchParams.set("limit", "50");
-    url.searchParams.set("status", "published");
-
-    const res = await fetch(url.toString(), { headers });
-    if (!res.ok) return { paths: [], manifest: {} };
-    const body = await res.json();
-    const posts = body?.data?.blogs ?? body;
-    if (!Array.isArray(posts)) return { paths: [], manifest: {} };
+    const posts = await fetchAllPublishedBlogs();
+    if (!Array.isArray(posts) || posts.length === 0) {
+      return { paths: [], manifest: {} };
+    }
 
     const manifest = {};
     const paths = [];

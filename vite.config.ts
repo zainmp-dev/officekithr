@@ -1,6 +1,10 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import {
+  FLOWPILOT_BLOG_API_URL,
+  FLOWPILOT_BLOG_DEV_PROXY,
+} from "./src/lib/flowpilot-blog-api";
 
 /** Load built CSS asynchronously so it does not block first paint. */
 function asyncCssPlugin(): Plugin {
@@ -31,13 +35,17 @@ export default defineConfig(({ mode }) => {
     host: "::",
     port: 8085,
     proxy: {
-      "/api/flowpilot-blogs": {
-        target: "https://flowpilot.officekithr.net",
+      [FLOWPILOT_BLOG_DEV_PROXY]: {
+        target: new URL(FLOWPILOT_BLOG_API_URL).origin,
         changeOrigin: true,
         rewrite: (path) =>
-          path.replace(/^\/api\/flowpilot-blogs/, "/api/api/blogs"),
+          path.replace(
+            new RegExp(`^${FLOWPILOT_BLOG_DEV_PROXY.replace(/\//g, "\\/")}`),
+            new URL(FLOWPILOT_BLOG_API_URL).pathname,
+          ),
         configure: (proxy) => {
           proxy.on("proxyReq", (proxyReq) => {
+            proxyReq.setHeader("Content-Type", "application/json");
             if (blogApiKey) {
               proxyReq.setHeader("Authorization", `Bearer ${blogApiKey}`);
             }

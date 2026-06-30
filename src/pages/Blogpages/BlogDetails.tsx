@@ -1,39 +1,160 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Calendar, User, Clock } from "lucide-react";
 import DOMPurify from "dompurify";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { getPostBySlug } from "@/services/blogService";
+import {
+  getCachedPostBySlug,
+  getPostBySlug,
+} from "@/services/blogService";
 import { PageJsonLd } from "@/components/PageJsonLd";
-import { usePageSeo, useSeoContext } from "@/seo/SeoContext";
+import { usePageSeo, useSeoContext, type BlogSeoEntry } from "@/seo/SeoContext";
 import { articleSchema, breadcrumbSchema } from "@/seo/schema";
 import { absoluteUrl, SITE } from "@/seo/site-config";
-import BackToBlog from "@/components/BackToBlog";
 import BlogActions from "@/components/BlogActions";
+import BackToBlog from "@/components/BackToBlog";
+import { formatBlogDate } from "@/utils/formatBlogDate";
+import { scheduleDeferred } from "@/lib/schedule-deferred";
+import { BlogPost } from "@/types";
+
+function manifestToPost(entry: BlogSeoEntry, slug: string): BlogPost {
+  return {
+    _id: `manifest-${slug}`,
+    title: entry.headline || entry.title,
+    excerpt: entry.description,
+    author: entry.author || "OfficeKit HR",
+    createdAt: entry.datePublished || new Date().toISOString().slice(0, 10),
+    updates: "Blogs",
+    readTime: "5 min read",
+    image: entry.image || "",
+    link: entry.path || `/blog/${slug}`,
+    slug,
+  };
+}
+
+function resolveInitialPost(slug: string, manifestEntry?: BlogSeoEntry): BlogPost | null {
+  const cached = getCachedPostBySlug(slug);
+  if (cached) return cached;
+  if (manifestEntry) return manifestToPost(manifestEntry, slug);
+  return null;
+}
+
+function BlogArticleShell({
+  children,
+  showBack = true,
+}: {
+  children: ReactNode;
+  showBack?: boolean;
+}) {
+  return (
+    <div className="min-h-screen bg-muted/25">
+      <Navigation />
+      <article className="pt-28 sm:pt-32 pb-16 sm:pb-20">
+        <div className="container mx-auto px-4 sm:px-6 max-w-3xl">
+          {showBack ? <BackToBlog className="mb-5 sm:mb-6" /> : null}
+          <div className="rounded-2xl border border-border/60 bg-background shadow-sm px-5 py-7 sm:px-8 sm:py-9">
+            {children}
+          </div>
+        </div>
+      </article>
+      <Footer />
+    </div>
+  );
+}
+
+function BlogContentSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse" aria-hidden>
+      <div className="h-4 bg-muted rounded w-full" />
+      <div className="h-4 bg-muted rounded w-[95%]" />
+      <div className="h-4 bg-muted rounded w-full" />
+      <div className="h-4 bg-muted rounded w-[88%]" />
+      <div className="h-8" />
+      <div className="h-4 bg-muted rounded w-full" />
+      <div className="h-4 bg-muted rounded w-[92%]" />
+      <div className="h-4 bg-muted rounded w-full" />
+    </div>
+  );
+}
+
+function BlogLoadingSkeleton() {
+  return (
+    <BlogArticleShell>
+      <div className="space-y-6 animate-pulse">
+        <div className="h-6 w-24 bg-muted rounded-full" />
+        <div className="h-10 w-3/4 max-w-xl bg-muted rounded" />
+        <div className="h-4 w-1/2 max-w-sm bg-muted rounded" />
+        <div className="aspect-[16/9] bg-muted rounded-xl" />
+        <BlogContentSkeleton />
+      </div>
+    </BlogArticleShell>
+  );
+}
 
 export default function BlogDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { blogManifest } = useSeoContext();
-  const [post, setPost] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(true);
   const manifestEntry = slug ? blogManifest[slug] : undefined;
+  const [post, setPost] = useState<BlogPost | null>(() =>
+    slug ? resolveInitialPost(slug, manifestEntry) : null,
+  );
+  const [contentLoading, setContentLoading] = useState(() => {
+    if (!slug) return false;
+    const cached = getCachedPostBySlug(slug);
+    return !cached?.content;
+  });
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
-    const fetchPost = async () => {
+
+    let cancelled = false;
+    setNotFound(false);
+
+    const cached = getCachedPostBySlug(slug);
+    if (cached?.content) {
+      setPost(cached);
+      setContentLoading(false);
+      return;
+    }
+
+    setContentLoading(true);
+    if (manifestEntry && !cached) {
+      setPost(manifestToPost(manifestEntry, slug));
+    }
+
+    const loadPost = async () => {
       try {
         const foundPost = await getPostBySlug(slug);
-        setPost(foundPost);
+        if (cancelled) return;
+
+        if (foundPost) {
+          setPost(foundPost);
+          setNotFound(false);
+        } else {
+          setPost((current) => {
+            if (!current) setNotFound(true);
+            return current;
+          });
+        }
       } catch {
-        setPost(null);
+        if (!cancelled) {
+          setPost((current) => {
+            if (!current) setNotFound(true);
+            return current;
+          });
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setContentLoading(false);
       }
     };
-    fetchPost();
-  }, [slug]);
+
+    return scheduleDeferred(() => {
+      void loadPost();
+    }, { timeout: 800 });
+  }, [slug, manifestEntry]);
 
   const excerpt = useMemo(() => {
     if (!post) return "";
@@ -45,19 +166,19 @@ export default function BlogDetail() {
 
   const seoConfig = useMemo(() => {
     const path = slug ? `/blog/${slug}` : "/resources/blogs";
-    if (loading) {
-      if (manifestEntry) return null;
-      return {
-        path,
-        title: "Loading… | OfficeKit HR Blog",
-        noindex: true,
-      };
-    }
-    if (!post) {
+    if (notFound) {
       return {
         path,
         title: "Blog Not Found | OfficeKit HR",
         description: "The article you requested could not be found.",
+        noindex: true,
+      };
+    }
+    if (!post) {
+      if (manifestEntry) return null;
+      return {
+        path,
+        title: "Loading… | OfficeKit HR Blog",
         noindex: true,
       };
     }
@@ -68,36 +189,30 @@ export default function BlogDetail() {
       type: "article" as const,
       ogImage: post.image,
     };
-  }, [slug, loading, post, excerpt, manifestEntry]);
+  }, [slug, post, excerpt, manifestEntry, notFound]);
 
   usePageSeo(seoConfig);
 
   const postUrl = slug ? absoluteUrl(`/blog/${slug}`) : SITE.url;
 
-  if (loading) {
+  if (notFound && !post) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <div className="min-h-[50vh] flex justify-center items-center text-muted-foreground pt-24">
-          Loading article…
+      <BlogArticleShell>
+        <div className="py-10 text-center">
+          <p className="text-lg font-medium text-foreground mb-4">Article not found</p>
+          <p className="text-muted-foreground mb-6">
+            This post may have been moved or removed.
+          </p>
+          <Link to="/resources/blogs">
+            <Button variant="outline">Browse all blogs</Button>
+          </Link>
         </div>
-      </div>
+      </BlogArticleShell>
     );
   }
 
   if (!post) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <div className="min-h-[50vh] flex flex-col justify-center items-center text-muted-foreground pt-24 px-4">
-          <p className="text-lg font-medium mb-4">Article not found</p>
-          <Link to="/resources/blogs">
-            <Button variant="outline">Back to Blog</Button>
-          </Link>
-        </div>
-        <Footer />
-      </div>
-    );
+    return <BlogLoadingSkeleton />;
   }
 
   const sanitizedContent = DOMPurify.sanitize(post.content || "");
@@ -106,8 +221,10 @@ export default function BlogDetail() {
     .replace(/(?:<br\s*\/?>\s*){3,}/gi, "<br /><br />")
     .trim();
 
+  const hasContent = cleanedContent.length > 0;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/25">
       <PageJsonLd
         nodes={[
           articleSchema({
@@ -115,7 +232,7 @@ export default function BlogDetail() {
             description: excerpt,
             url: postUrl,
             image: post.image || SITE.ogImage,
-            datePublished: post.createdAt || post.date,
+            datePublished: post.createdAt,
             dateModified: post.updatedAt,
             author: post.author,
           }),
@@ -127,80 +244,79 @@ export default function BlogDetail() {
         ]}
       />
       <Navigation />
-      <article className="pt-24 pb-24">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <BackToBlog className="mb-10 mt-2" />
+      <article className="pt-28 sm:pt-32 pb-16 sm:pb-20">
+        <div className="container mx-auto px-4 sm:px-6 max-w-3xl">
+          <BackToBlog className="mb-5 sm:mb-6" />
 
-          <header className="mb-8">
-            <div className="mb-4">
-              <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded-full">
-                Blogs
+          <div className="rounded-2xl border border-border/60 bg-background shadow-sm px-5 py-7 sm:px-8 sm:py-9">
+            <header className="mb-7 sm:mb-8">
+              <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wide text-primary bg-primary/10 rounded-full mb-4">
+                {post.updates || "Blogs"}
               </span>
-            </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-              {post.title}
-            </h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 leading-tight tracking-tight">
+                {post.title}
+              </h1>
 
-            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" aria-hidden />
-                <span className="font-medium">{post.author}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" aria-hidden />
-                <span>
-                  {new Date(post.date || post.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span className="font-medium text-foreground/80">{post.author}</span>
+                </span>
+                <span className="hidden sm:inline text-border" aria-hidden>
+                  ·
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <time dateTime={post.createdAt}>
+                    {formatBlogDate(post.createdAt)}
+                  </time>
+                </span>
+                <span className="hidden sm:inline text-border" aria-hidden>
+                  ·
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  {post.readTime || "5 min read"}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" aria-hidden />
-                <span>
-                  {new Date(post.createdAt || post.updatedAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
-              </div>
-              <span>{post.readTime || "5 min read"}</span>
+            </header>
+
+            <div className="aspect-[16/9] rounded-xl mb-6 overflow-hidden ring-1 ring-border/50">
+              <img
+                src={post.image || SITE.ogImage}
+                alt={post.title}
+                className="w-full h-full object-cover"
+                loading="eager"
+                fetchPriority="high"
+                width={1200}
+                height={675}
+              />
             </div>
 
-            <BlogActions title={post.title} />
-            <div className="h-px bg-border/80 my-8" />
-          </header>
+            <BlogActions title={post.title} variant="subtle" className="mb-8" />
 
-          <div className="aspect-video rounded-xl mb-10 overflow-hidden shadow-lg">
-            <img
-              src={post.image || SITE.ogImage}
-              alt={post.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              width={1200}
-              height={630}
-            />
-          </div>
+            {contentLoading || !hasContent ? (
+              <BlogContentSkeleton />
+            ) : (
+              <div
+                className="blog-content mb-10"
+                dangerouslySetInnerHTML={{ __html: cleanedContent }}
+              />
+            )}
 
-          <div
-            className="blog-content mb-16"
-            dangerouslySetInnerHTML={{ __html: cleanedContent }}
-          />
-
-          <div className="bg-gradient-subtle rounded-lg p-8 mt-12 text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">
-              Transform Your HR with OfficeKit
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Discover how our AI-powered HRMS helps businesses simplify HR, engage employees,
-              and drive growth.
-            </p>
-            <Link to="/resources/blogs">
-              <Button size="lg">Learn More</Button>
-            </Link>
+            <div className="bg-gradient-subtle rounded-xl p-6 sm:p-8 mt-10 text-center border border-border/40">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
+                Transform Your HR with OfficeKit
+              </h2>
+              <p className="text-muted-foreground mb-5 text-sm sm:text-base">
+                Discover how our AI-powered HRMS helps businesses simplify HR, engage employees,
+                and drive growth.
+              </p>
+              <Link to="/contact">
+                <Button size="lg">Get in touch</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </article>

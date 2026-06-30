@@ -9,6 +9,7 @@ type BlogActionsProps = {
   url?: string;
   className?: string;
   contactHref?: string;
+  variant?: "default" | "subtle";
 };
 
 import { safeLocalGet, safeLocalSet } from "@/lib/safe-storage";
@@ -35,7 +36,13 @@ const BlogActions = ({
   url,
   className = "",
   contactHref = "/contact",
+  variant = "default",
 }: BlogActionsProps) => {
+  const isSubtle = variant === "subtle";
+  const buttonVariant = isSubtle ? "ghost" : "outline";
+  const buttonClass = isSubtle
+    ? "h-8 px-2.5 text-muted-foreground hover:text-foreground"
+    : undefined;
   const currentUrl = useMemo(() => {
     if (url) return url;
     if (typeof window !== "undefined") return window.location.href;
@@ -107,17 +114,35 @@ const BlogActions = ({
   };
 
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
-      <Button variant="outline" size="sm" onClick={handleShare}>
-        <Share2 className="h-4 w-4 mr-1" />
+    <div
+      className={[
+        "flex flex-wrap items-center gap-1",
+        isSubtle ? "border-y border-border/50 py-2" : "gap-2",
+        className,
+      ].join(" ")}
+    >
+      <Button
+        variant={buttonVariant}
+        size="sm"
+        className={buttonClass}
+        onClick={handleShare}
+      >
+        <Share2 className="h-4 w-4 mr-1.5" />
         Share
       </Button>
-      <Button variant="outline" size="sm" onClick={handleSave}>
-        <BookmarkPlus className="h-4 w-4 mr-1" />
+      <Button
+        variant={buttonVariant}
+        size="sm"
+        className={buttonClass}
+        onClick={handleSave}
+      >
+        <BookmarkPlus className="h-4 w-4 mr-1.5" />
         {isSaved ? "Saved" : "Save"}
       </Button>
-      <Link to={contactHref}>
-        <Button variant="outline" size="sm">Contact Us</Button>
+      <Link to={contactHref} className={isSubtle ? "ml-auto" : undefined}>
+        <Button variant={buttonVariant} size="sm" className={buttonClass}>
+          Contact Us
+        </Button>
       </Link>
     </div>
   );

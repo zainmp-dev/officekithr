@@ -1,4 +1,7 @@
-/** Client-safe env (Vite). Server secrets belong in hosting env, not here. */
+import {
+  FLOWPILOT_BLOG_API_URL,
+  FLOWPILOT_BLOG_DEV_PROXY,
+} from "@/lib/flowpilot-blog-api";
 
 function str(value: string | undefined, fallback: string): string {
   const v = value?.trim();
@@ -31,9 +34,7 @@ export const env = {
   syncoraApiKey: str(import.meta.env.VITE_SYNCORA_API_KEY, ""),
   blogApiUrl: str(
     import.meta.env.VITE_BLOG_API_URL,
-    import.meta.env.DEV
-      ? "/api/flowpilot-blogs"
-      : "https://flowpilot.officekithr.net/api/api/blogs",
+    import.meta.env.DEV ? FLOWPILOT_BLOG_DEV_PROXY : FLOWPILOT_BLOG_API_URL,
   ),
   blogApiKey: str(import.meta.env.VITE_BLOG_API_KEY, ""),
   gaMeasurementId: str(

@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { BLOG_CATEGORIES, BLOG_LISTING_POSTS } from "@/data/blog-listing";
 import { BLOG_CARD_IMAGE_FALLBACK } from "@/data/blog-images";
 import { formatBlogDate } from "@/utils/formatBlogDate";
-import { getAllPosts } from "@/services/blogService";
+import { getCachedPosts, prefetchAllPosts } from "@/services/blogService";
 import { BlogPost } from "@/types";
+import { scheduleDeferred } from "@/lib/schedule-deferred";
 
 function sortByDateDesc(posts: BlogPost[]): BlogPost[] {
   return [...posts].sort(
@@ -35,22 +36,35 @@ function mergePosts(apiPosts: BlogPost[], staticPosts: BlogPost[]): BlogPost[] {
 
 const Blog = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [apiPosts, setApiPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [apiPosts, setApiPosts] = useState<BlogPost[]>(() => getCachedPosts());
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    getAllPosts()
-      .then((posts) => {
-        if (!cancelled) setApiPosts(posts);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
+
+    const warmCache = () => {
+      const cached = getCachedPosts();
+      if (cached.length > 0) {
+        setApiPosts(cached);
+        return;
+      }
+
+      setSyncing(true);
+      prefetchAllPosts()
+        .then((posts) => {
+          if (!cancelled) setApiPosts(posts);
+        })
+        .finally(() => {
+          if (!cancelled) setSyncing(false);
+        });
     };
+
+    return scheduleDeferred(warmCache, { timeout: 1500 });
   }, []);
+
+  const handlePostHover = () => {
+    prefetchAllPosts().catch(() => {});
+  };
 
   const allPosts = useMemo(
     () => mergePosts(apiPosts, BLOG_LISTING_POSTS),
@@ -138,7 +152,12 @@ const Blog = () => {
                 </h2>
               </div>
 
-              <Link to={featuredPost.link} className="block group">
+              <Link
+                to={featuredPost.link}
+                className="block group"
+                onMouseEnter={handlePostHover}
+                onFocus={handlePostHover}
+              >
                 <Card className="overflow-hidden border-border shadow-strong transition-shadow group-hover:shadow-lg">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <div className="relative overflow-hidden aspect-[16/10] lg:aspect-auto lg:min-h-[280px]">
@@ -204,23 +223,22 @@ const Blog = () => {
                 Latest Articles
               </h2>
               <p className="text-sm sm:text-base text-muted-foreground">
-                {loading ? "Loading articles…" : (
-                  <>
-                    {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""}
-                    {activeCategory !== "All Posts" ? ` in ${activeCategory}` : ""}
-                  </>
-                )}
+                {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""}
+                {activeCategory !== "All Posts" ? ` in ${activeCategory}` : ""}
+                {syncing ? " · refreshing…" : ""}
               </p>
             </div>
 
-            {loading && filteredPosts.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                Loading articles…
-              </div>
-            ) : latestPosts.length > 0 ? (
+            {latestPosts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 {latestPosts.map((post) => (
-                  <Link key={post._id} to={post.link} className="block group h-full">
+                  <Link
+                    key={post._id}
+                    to={post.link}
+                    className="block group h-full"
+                    onMouseEnter={handlePostHover}
+                    onFocus={handlePostHover}
+                  >
                     <Card className="overflow-hidden border-border shadow-medium h-full flex flex-col transition-shadow group-hover:shadow-lg">
                       <div className="relative overflow-hidden aspect-[16/10]">
                         <img
