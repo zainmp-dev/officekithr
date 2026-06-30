@@ -5,6 +5,9 @@ export const FLOWPILOT_BLOG_API_URL =
 
 export const FLOWPILOT_BLOG_DEV_PROXY = "/api/flowpilot-blogs";
 
+/** Legacy host — blog traffic must not use this endpoint. */
+export const DEPRECATED_BLOG_API_HOST = "api.officekithr.com";
+
 export const FLOWPILOT_BLOG_PAGE_SIZE = 20;
 
 export const FLOWPILOT_BLOG_STATUS = "published" as const;
@@ -14,6 +17,24 @@ export type FlowPilotBlogQuery = {
   limit?: number;
   status?: typeof FLOWPILOT_BLOG_STATUS;
 };
+
+/** Always resolve to FlowPilot (or the dev proxy). Ignores api.officekithr.com overrides. */
+export function resolveFlowpilotBlogBaseUrl(
+  configured: string | undefined,
+  isDev = false,
+): string {
+  const value = configured?.trim();
+
+  if (
+    value &&
+    !value.includes(DEPRECATED_BLOG_API_HOST) &&
+    (value === FLOWPILOT_BLOG_DEV_PROXY || value.includes("flowpilot.officekithr.net"))
+  ) {
+    return value;
+  }
+
+  return isDev ? FLOWPILOT_BLOG_DEV_PROXY : FLOWPILOT_BLOG_API_URL;
+}
 
 export function flowpilotBlogHeaders(apiKey: string): HeadersInit {
   const headers: Record<string, string> = {

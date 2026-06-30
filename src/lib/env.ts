@@ -1,7 +1,4 @@
-import {
-  FLOWPILOT_BLOG_API_URL,
-  FLOWPILOT_BLOG_DEV_PROXY,
-} from "@/lib/flowpilot-blog-api";
+import { resolveFlowpilotBlogBaseUrl } from "@/lib/flowpilot-blog-api";
 
 function str(value: string | undefined, fallback: string): string {
   const v = value?.trim();
@@ -32,9 +29,9 @@ export const env = {
     "https://app.syncoraai.com/api/leads/external",
   ),
   syncoraApiKey: str(import.meta.env.VITE_SYNCORA_API_KEY, ""),
-  blogApiUrl: str(
+  blogApiUrl: resolveFlowpilotBlogBaseUrl(
     import.meta.env.VITE_BLOG_API_URL,
-    import.meta.env.DEV ? FLOWPILOT_BLOG_DEV_PROXY : FLOWPILOT_BLOG_API_URL,
+    import.meta.env.DEV,
   ),
   blogApiKey: str(import.meta.env.VITE_BLOG_API_KEY, ""),
   gaMeasurementId: str(

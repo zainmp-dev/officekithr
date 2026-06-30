@@ -3,9 +3,25 @@
 export const FLOWPILOT_BLOG_API_URL =
   "https://flowpilot.officekithr.net/api/api/blogs";
 
+export const DEPRECATED_BLOG_API_HOST = "api.officekithr.com";
+
 export const FLOWPILOT_BLOG_PAGE_SIZE = 20;
 
 export const FLOWPILOT_BLOG_STATUS = "published";
+
+export function resolveFlowpilotBlogBaseUrl(configured) {
+  const value = configured?.trim();
+
+  if (
+    value &&
+    !value.includes(DEPRECATED_BLOG_API_HOST) &&
+    value.includes("flowpilot.officekithr.net")
+  ) {
+    return value;
+  }
+
+  return FLOWPILOT_BLOG_API_URL;
+}
 
 export function flowpilotBlogHeaders(apiKey = "") {
   const headers = { "Content-Type": "application/json" };
@@ -24,10 +40,9 @@ export function flowpilotBlogUrl(baseUrl, { page = 1, limit = FLOWPILOT_BLOG_PAG
 
 /** Fetch all published blog pages from FlowPilot. */
 export async function fetchAllPublishedBlogs({ apiUrl, apiKey } = {}) {
-  const base =
-    apiUrl?.trim() ||
-    process.env.VITE_BLOG_API_URL?.trim() ||
-    FLOWPILOT_BLOG_API_URL;
+  const base = resolveFlowpilotBlogBaseUrl(
+    apiUrl?.trim() || process.env.VITE_BLOG_API_URL,
+  );
   const token = apiKey?.trim() ?? process.env.VITE_BLOG_API_KEY?.trim() ?? "";
 
   const posts = [];
