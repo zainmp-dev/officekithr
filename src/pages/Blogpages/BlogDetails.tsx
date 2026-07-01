@@ -5,19 +5,17 @@ import DOMPurify from "dompurify";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import {
-  getCachedPostBySlug,
-  getPostBySlug,
-  prefetchAllPosts,
-} from "@/services/blogService";
+import { Badge } from "@/components/ui/badge";
+import { getCachedPostBySlug, getPostBySlug } from "@/services/blogService";
 import { PageJsonLd } from "@/components/PageJsonLd";
 import { usePageSeo, useSeoContext, type BlogSeoEntry } from "@/seo/SeoContext";
 import { articleSchema, breadcrumbSchema } from "@/seo/schema";
 import { absoluteUrl, SITE } from "@/seo/site-config";
 import BlogActions from "@/components/BlogActions";
 import BackToBlog from "@/components/BackToBlog";
-import { formatBlogDate } from "@/utils/formatBlogDate";
+import { formatBlogDateLong } from "@/utils/formatBlogDate";
 import { prepareBlogContentHtml } from "@/utils/prepareBlogContent";
+import { BLOG_CARD_IMAGE_FALLBACK } from "@/data/blog-images";
 import { BlogPost } from "@/types";
 
 /** Clears fixed announcement bar + floating nav (see Navigation.tsx). */
@@ -47,35 +45,43 @@ function resolveInitialPost(slug: string, manifestEntry?: BlogSeoEntry): BlogPos
 
 function BlogContentSkeleton() {
   return (
-    <div className="space-y-3 animate-pulse py-2" aria-hidden>
-      <div className="h-4 bg-muted rounded w-full" />
-      <div className="h-4 bg-muted rounded w-[94%]" />
-      <div className="h-4 bg-muted rounded w-full" />
-      <div className="h-4 bg-muted rounded w-[88%]" />
+    <div className="space-y-4 py-1" aria-hidden>
+      <div className="h-4 bg-muted/80 rounded-md w-full animate-pulse" />
+      <div className="h-4 bg-muted/80 rounded-md w-[96%] animate-pulse [animation-delay:75ms]" />
+      <div className="h-4 bg-muted/80 rounded-md w-full animate-pulse [animation-delay:150ms]" />
+      <div className="h-4 bg-muted/80 rounded-md w-[92%] animate-pulse [animation-delay:225ms]" />
+      <div className="h-4 bg-muted/60 rounded-md w-[78%] animate-pulse [animation-delay:300ms]" />
+      <div className="h-24 bg-muted/50 rounded-lg w-full mt-6 animate-pulse [animation-delay:375ms]" />
+      <div className="h-4 bg-muted/80 rounded-md w-full animate-pulse [animation-delay:450ms]" />
+      <div className="h-4 bg-muted/80 rounded-md w-[88%] animate-pulse [animation-delay:525ms]" />
     </div>
   );
 }
 
 function BlogArticleLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-background">
       <Navigation />
-      <article className={`${BLOG_ARTICLE_TOP} pb-14 sm:pb-20`}>
-        <div className="container mx-auto px-4 sm:px-6 max-w-3xl">{children}</div>
+      <article className={`${BLOG_ARTICLE_TOP} pb-16 sm:pb-24`}>
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">{children}</div>
       </article>
       <Footer />
     </div>
   );
 }
 
-function BlogPostCard({ children }: { children: ReactNode }) {
+function BlogMetaItem({
+  icon: Icon,
+  children,
+}: {
+  icon: typeof User;
+  children: ReactNode;
+}) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-background shadow-sm overflow-hidden">
-      <div className="border-b border-border/50 bg-muted/20 px-4 py-3 sm:px-6">
-        <BackToBlog />
-      </div>
-      <div className="px-4 py-6 sm:px-7 sm:py-8">{children}</div>
-    </div>
+    <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+      <Icon className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
+      {children}
+    </span>
   );
 }
 
@@ -129,7 +135,6 @@ export default function BlogDetail() {
       }
     };
 
-    prefetchAllPosts().catch(() => {});
     void loadPost();
 
     return () => {
@@ -143,6 +148,15 @@ export default function BlogDetail() {
       post.excerpt?.trim() ||
       (post.content ? post.content.replace(/<[^>]+>/g, "").trim().slice(0, 160) : "")
     );
+  }, [post]);
+
+  const cleanedContent = useMemo(() => {
+    if (!post?.content?.trim()) return "";
+    const sanitized = DOMPurify.sanitize(post.content);
+    return prepareBlogContentHtml(sanitized, {
+      title: post.title,
+      featuredImage: post.image || SITE.ogImage,
+    });
   }, [post]);
 
   const seoConfig = useMemo(() => {
@@ -175,21 +189,20 @@ export default function BlogDetail() {
   usePageSeo(seoConfig);
 
   const postUrl = slug ? absoluteUrl(`/blog/${slug}`) : SITE.url;
+  const heroImage = post?.image || SITE.ogImage;
 
   if (notFound && !post) {
     return (
       <BlogArticleLayout>
-        <BlogPostCard>
-          <div className="py-8 text-center">
-            <p className="text-lg font-medium text-foreground mb-3">Article not found</p>
-            <p className="text-muted-foreground mb-6 text-sm">
-              This post may have been moved or removed.
-            </p>
-            <Link to="/resources/blogs">
-              <Button variant="outline">Browse all blogs</Button>
-            </Link>
-          </div>
-        </BlogPostCard>
+        <div className="py-16 text-center">
+          <p className="text-xl font-semibold text-foreground mb-2">Article not found</p>
+          <p className="text-muted-foreground mb-8 text-sm max-w-md mx-auto">
+            This post may have been moved or removed.
+          </p>
+          <Link to="/resources/blogs">
+            <Button variant="outline">Browse all blogs</Button>
+          </Link>
+        </div>
       </BlogArticleLayout>
     );
   }
@@ -197,24 +210,21 @@ export default function BlogDetail() {
   if (!post) {
     return (
       <BlogArticleLayout>
-        <BlogPostCard>
-          <div className="space-y-5 animate-pulse">
-            <div className="h-6 w-24 bg-muted rounded-full" />
-            <div className="h-9 w-full max-w-lg bg-muted rounded" />
-            <div className="h-4 w-2/3 max-w-xs bg-muted rounded" />
-            <div className="aspect-[16/9] bg-muted rounded-xl" />
-            <BlogContentSkeleton />
+        <BackToBlog className="mb-8" />
+        <div className="space-y-6 animate-pulse">
+          <div className="h-7 w-28 bg-muted rounded-full" />
+          <div className="h-10 sm:h-12 w-full max-w-2xl bg-muted rounded-lg" />
+          <div className="flex gap-4">
+            <div className="h-4 w-24 bg-muted rounded" />
+            <div className="h-4 w-32 bg-muted rounded" />
+            <div className="h-4 w-20 bg-muted rounded" />
           </div>
-        </BlogPostCard>
+          <div className="aspect-[16/9] bg-muted rounded-2xl" />
+          <BlogContentSkeleton />
+        </div>
       </BlogArticleLayout>
     );
   }
-
-  const sanitizedContent = DOMPurify.sanitize(post.content || "");
-  const cleanedContent = prepareBlogContentHtml(sanitizedContent, {
-    title: post.title,
-    featuredImage: post.image || SITE.ogImage,
-  });
 
   const hasHtmlContent = cleanedContent.length > 0;
   const fallbackText = excerpt;
@@ -227,7 +237,7 @@ export default function BlogDetail() {
             title: post.title,
             description: excerpt,
             url: postUrl,
-            image: post.image || SITE.ogImage,
+            image: heroImage,
             datePublished: post.createdAt,
             dateModified: post.updatedAt,
             author: post.author,
@@ -240,84 +250,80 @@ export default function BlogDetail() {
         ]}
       />
 
-      <BlogPostCard>
-        <header className="mb-6 sm:mb-7">
-          <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wide text-primary bg-primary/10 rounded-full mb-3 sm:mb-4">
-            {post.updates || "Blogs"}
-          </span>
+      <BackToBlog className="mb-8" />
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4 leading-snug tracking-tight">
-            {post.title}
-          </h1>
+      <header className="mb-8 sm:mb-10">
+        <Badge variant="secondary" className="mb-4 font-medium">
+          {post.updates || "Blogs"}
+        </Badge>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="font-medium text-foreground/80">{post.author}</span>
-            </span>
-            <span className="text-border" aria-hidden>
-              ·
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <time dateTime={post.createdAt}>{formatBlogDate(post.createdAt)}</time>
-            </span>
-            <span className="text-border" aria-hidden>
-              ·
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {post.readTime || "5 min read"}
-            </span>
-          </div>
-        </header>
+        <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] font-bold text-foreground mb-5 leading-[1.15] tracking-tight">
+          {post.title}
+        </h1>
 
-        <div className="aspect-[16/9] rounded-xl mb-5 sm:mb-6 overflow-hidden ring-1 ring-border/50">
-          <img
-            src={post.image || SITE.ogImage}
-            alt={post.title}
-            className="w-full h-full object-cover"
-            loading="eager"
-            fetchPriority="high"
-            width={1200}
-            height={675}
-          />
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <BlogMetaItem icon={User}>
+            <span className="font-medium text-foreground/90">{post.author}</span>
+          </BlogMetaItem>
+          <BlogMetaItem icon={Calendar}>
+            <time dateTime={post.createdAt}>{formatBlogDateLong(post.createdAt)}</time>
+          </BlogMetaItem>
+          <BlogMetaItem icon={Clock}>{post.readTime || "5 min read"}</BlogMetaItem>
         </div>
+      </header>
 
-        <BlogActions title={post.title} variant="subtle" className="mb-6 sm:mb-8" />
+      <div className="aspect-[16/9] rounded-2xl mb-8 sm:mb-10 overflow-hidden bg-muted shadow-sm">
+        <img
+          src={heroImage}
+          alt={post.title}
+          className="w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          width={1200}
+          height={675}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = BLOG_CARD_IMAGE_FALLBACK;
+          }}
+        />
+      </div>
 
-        {contentLoading ? (
+      <BlogActions title={post.title} variant="subtle" className="mb-8" />
+
+      {contentLoading ? (
+        <div role="status" aria-live="polite" aria-label="Loading article content">
           <BlogContentSkeleton />
-        ) : hasHtmlContent ? (
-          <div
-            className="blog-content mb-8 sm:mb-10"
-            dangerouslySetInnerHTML={{ __html: cleanedContent }}
-          />
-        ) : fallbackText ? (
-          <div className="blog-content mb-8 sm:mb-10 text-muted-foreground leading-relaxed">
-            <p>{fallbackText}</p>
-          </div>
-        ) : (
-          <p className="mb-8 text-sm text-muted-foreground">
-            Article summary is not available right now. Please check back soon.
-          </p>
-        )}
-
-        <div className="bg-gradient-subtle rounded-xl p-5 sm:p-8 text-center border border-border/40">
-          <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-2 sm:mb-3">
-            Transform Your HR with OfficeKit
-          </h2>
-          <p className="text-muted-foreground mb-4 sm:mb-5 text-sm sm:text-base">
-            Discover how our AI-powered HRMS helps businesses simplify HR, engage employees,
-            and drive growth.
-          </p>
-          <Link to="/contact">
-            <Button size="lg" className="w-full sm:w-auto">
-              Get in touch
-            </Button>
-          </Link>
         </div>
-      </BlogPostCard>
+      ) : hasHtmlContent ? (
+        <div
+          className="blog-content mb-10 sm:mb-12 animate-in fade-in-0 duration-300"
+          dangerouslySetInnerHTML={{ __html: cleanedContent }}
+        />
+      ) : fallbackText ? (
+        <div className="blog-content mb-10 sm:mb-12 text-muted-foreground leading-relaxed animate-in fade-in-0 duration-300">
+          <p className="text-lg">{fallbackText}</p>
+        </div>
+      ) : (
+        <p className="mb-10 text-sm text-muted-foreground">
+          Article summary is not available right now. Please check back soon.
+        </p>
+      )}
+
+      <aside className="bg-gradient-subtle rounded-2xl p-6 sm:p-10 text-center border border-border/50">
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2 sm:mb-3">
+          Transform Your HR with OfficeKit
+        </h2>
+        <p className="text-muted-foreground mb-5 sm:mb-6 text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+          Discover how our AI-powered HRMS helps businesses simplify HR, engage employees,
+          and drive growth.
+        </p>
+        <Link to="/contact">
+          <Button size="lg" className="w-full sm:w-auto">
+            Get in touch
+          </Button>
+        </Link>
+      </aside>
     </BlogArticleLayout>
   );
 }

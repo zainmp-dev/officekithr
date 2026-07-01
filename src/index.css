@@ -442,6 +442,23 @@ html[data-perf-mode="mobile"] .section-fade-in {
 /* Blog content cleanup & spacing for HTML content */
 .blog-content {
   line-height: 1.85;
+  color: hsl(var(--foreground) / 0.92);
+  font-size: 1.0625rem;
+}
+
+.blog-content img {
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog-content blockquote {
+  border-left: 3px solid hsl(var(--primary) / 0.5);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
 }
 
 .blog-content p {

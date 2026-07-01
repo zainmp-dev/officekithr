@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { BLOG_CATEGORIES, BLOG_LISTING_POSTS } from "@/data/blog-listing";
 import { BLOG_CARD_IMAGE_FALLBACK } from "@/data/blog-images";
 import { formatBlogDate } from "@/utils/formatBlogDate";
-import { getCachedPosts, prefetchAllPosts } from "@/services/blogService";
+import { getCachedPosts, prefetchAllPosts, prefetchPostBySlug } from "@/services/blogService";
 import { BlogPost } from "@/types";
 import { scheduleDeferred } from "@/lib/schedule-deferred";
 
@@ -62,8 +62,10 @@ const Blog = () => {
     return scheduleDeferred(warmCache, { timeout: 1500 });
   }, []);
 
-  const handlePostHover = () => {
-    prefetchAllPosts().catch(() => {});
+  const handlePostHover = (post: BlogPost) => {
+    const slug = post.slug || post.link.replace(/^\/blog\//, "");
+    if (slug) prefetchPostBySlug(slug);
+    else prefetchAllPosts().catch(() => {});
   };
 
   const allPosts = useMemo(
@@ -155,8 +157,8 @@ const Blog = () => {
               <Link
                 to={featuredPost.link}
                 className="block group"
-                onMouseEnter={handlePostHover}
-                onFocus={handlePostHover}
+                onMouseEnter={() => handlePostHover(featuredPost)}
+                onFocus={() => handlePostHover(featuredPost)}
               >
                 <Card className="overflow-hidden border-border shadow-strong transition-shadow group-hover:shadow-lg">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -236,8 +238,8 @@ const Blog = () => {
                     key={post._id}
                     to={post.link}
                     className="block group h-full"
-                    onMouseEnter={handlePostHover}
-                    onFocus={handlePostHover}
+                    onMouseEnter={() => handlePostHover(post)}
+                    onFocus={() => handlePostHover(post)}
                   >
                     <Card className="overflow-hidden border-border shadow-medium h-full flex flex-col transition-shadow group-hover:shadow-lg">
                       <div className="relative overflow-hidden aspect-[16/10]">

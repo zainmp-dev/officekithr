@@ -57,7 +57,10 @@ export function flowpilotBlogUrl(
 }
 
 /** Single blog — list endpoint omits `content`; detail returns full HTML body. */
-export function flowpilotBlogDetailUrl(baseUrl: string, blogId: string): string {
+export function flowpilotBlogDetailUrl(
+  baseUrl: string,
+  blogIdOrSlug: string,
+): string {
   const root = baseUrl.split("?")[0].replace(/\/$/, "");
-  return `${root}/${encodeURIComponent(blogId)}`;
+  return `${root}/${encodeURIComponent(blogIdOrSlug)}`;
 }
