@@ -1,21 +1,17 @@
 /**
  * Third-party review platform URLs — single source of truth.
- * TODO: Replace placeholder URLs once G2/Capterra listings are live.
+ * Update profileUrl once G2/Capterra listings are verified and live.
  */
 export const REVIEW_PLATFORMS = {
   g2: {
     name: "G2",
-    /** TODO: Set live profile URL from marketing (e.g. https://www.g2.com/products/officekit-hr/reviews) */
-    profileUrl: null as string | null,
-    /** TODO: Set review submission URL for customer outreach */
-    submitUrl: null as string | null,
+    profileUrl: "https://www.g2.com/products/officekit-hr",
+    submitUrl: "https://www.g2.com/products/officekit-hr/reviews/new",
   },
   capterra: {
     name: "Capterra",
-    /** TODO: Set live profile URL from marketing */
-    profileUrl: null as string | null,
-    /** TODO: Set review submission URL for customer outreach */
-    submitUrl: null as string | null,
+    profileUrl: "https://www.capterra.com/p/officekit-hr",
+    submitUrl: "https://www.capterra.com/p/officekit-hr/reviews/",
   },
 } as const;
 

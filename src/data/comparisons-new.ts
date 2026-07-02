@@ -897,6 +897,53 @@ export const COMPARISONS_NEW: Record<string, ComparisonConfig> = {
     faqs: [{ question: "How does OfficeKit compare to SumHR pricing?", answer: "OfficeKit offers modular per-user pricing with GCC modules — compare on /pricing." }],
     relatedLinks: [{ label: "Startups HRMS", href: "/longtail/best-hrms-for-startups-india" }, { label: "Contact", href: "/contact" }],
   },
+  "spreadsheets-alternative": {
+    slug: "spreadsheets-alternative",
+    path: "/compare/spreadsheets-alternative",
+    title: "HRMS vs Spreadsheets | Why Excel Fails for HR — OfficeKit HR",
+    metaDescription: "Still using Excel for HR and payroll? See why 500+ companies switched from spreadsheets to OfficeKit HR for compliance, automation, and scale.",
+    competitorName: "Spreadsheets (Excel / Google Sheets)",
+    h1: "OfficeKit HR as a spreadsheet replacement for HR",
+    intro: "Spreadsheets work for 10 employees. They break at 50. By 100, you're drowning in version conflicts, compliance errors, and manual payroll calculations. OfficeKit HR replaces Excel-based HR with automated payroll, attendance, and compliance — built for India and GCC.",
+    directAnswer: "OfficeKit HR replaces spreadsheet-based HR with automated payroll (PF, ESI, WPS), attendance tracking, compliance reporting, and employee self-service — eliminating version conflicts, formula errors, and manual data entry that plague Excel-based HR processes.",
+    definition: {
+      term: "HRMS vs spreadsheets",
+      meaning: "The comparison between managing HR processes via Excel or Google Sheets versus using a dedicated Human Resource Management System with built-in automation, compliance, and security.",
+    },
+    rows: [
+      { aspect: "Payroll accuracy", officekit: "Automated PF, ESI, PT, TDS, WPS calculations", competitor: "Manual formulas — error-prone at scale" },
+      { aspect: "Compliance", officekit: "Built-in statutory compliance for India + 6 GCC countries", competitor: "Manual tracking — missed deadlines, penalties" },
+      { aspect: "Multi-user access", officekit: "Role-based access for HR, managers, employees", competitor: "File sharing — version conflicts, security risks" },
+      { aspect: "Audit trail", officekit: "Complete log of every change, payroll run, approval", competitor: "No change history — who changed what?" },
+      { aspect: "Employee self-service", officekit: "Mobile app for payslips, leave, attendance", competitor: "Email requests — manual processing" },
+      { aspect: "Time savings", officekit: "15-25 hours/month saved per HR staff member", competitor: "Hours of manual data entry and reconciliation" },
+      { aspect: "Security", officekit: "256-bit encryption, access controls, backups", competitor: "Password-protected files — easily shared, lost" },
+      { aspect: "Scale", officekit: "50 to 1,000+ employees without process changes", competitor: "Breaks down beyond ~50 employees" },
+    ],
+    whenOfficeKit: [
+      "You have 50+ employees and payroll takes more than 1 day",
+      "You've had compliance errors or missed statutory deadlines",
+      "Multiple people need access to HR data simultaneously",
+      "You're expanding to GCC and need WPS/GOSI compliance",
+      "You want employees to self-serve payslips, leave, and attendance",
+    ],
+    whenCompetitor: [
+      "You have fewer than 10 employees and simple payroll needs",
+      "You're a freelancer or sole proprietor with no compliance requirements",
+      "You need a one-time report and don't need ongoing HR management",
+    ],
+    faqs: [
+      { question: "When should I move from Excel to an HRMS?", answer: "Most companies outgrow spreadsheets at 30-50 employees. If payroll takes more than a day, you've had compliance errors, or multiple people need HR data access — it's time to switch." },
+      { question: "How long does it take to migrate from Excel to OfficeKit?", answer: "Most teams migrate in 2-4 weeks. OfficeKit provides import templates for employee data, attendance records, and payroll history. Our onboarding team handles the migration." },
+      { question: "Can I still export reports from OfficeKit?", answer: "Yes. OfficeKit exports to Excel, PDF, and CSV. You get the flexibility of spreadsheet exports with the accuracy of automated calculations." },
+    ],
+    relatedLinks: [
+      { label: "HRMS India", href: "/hrms-software-india" },
+      { label: "Payroll software UAE", href: "/payroll-software-uae" },
+      { label: "ROI calculator", href: "/tools/hrms-roi-calculator" },
+      { label: "Book a demo", href: "/contact" },
+    ],
+  },
 };
 
 export const COMPARISON_NEW_SLUGS = Object.keys(COMPARISONS_NEW);

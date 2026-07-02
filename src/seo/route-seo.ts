@@ -295,6 +295,18 @@ export const STATIC_ROUTES: RouteSeoConfig[] = [
       "Read verified customer testimonials from HR leaders using OfficeKit HR for India and GCC payroll, attendance, and compliance.",
   },
   {
+    path: "/security",
+    title: "Security & Compliance | OfficeKit HR",
+    description:
+      "OfficeKit HR security architecture: 256-bit encryption, GDPR compliance, role-based access, audit logs, data residency in India and UAE, and 99.9% uptime SLA.",
+  },
+  {
+    path: "/accessibility",
+    title: "Accessibility Statement | OfficeKit HR",
+    description:
+      "OfficeKit HR is committed to WCAG 2.2 Level AA accessibility. Learn about our accessibility features, standards, and how to report issues.",
+  },
+  {
     path: "/guides",
     title: "HR & Payroll Guides | OfficeKit HR",
     description:

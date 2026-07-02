@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import { PageShell } from "@/seo/PageShell";
 import { TESTIMONIALS } from "@/data/testimonials-data";
 import { breadcrumbSchema, reviewSchema } from "@/seo/schema";
-import { REVIEW_PLATFORMS } from "@/data/review-platforms";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ExternalLink, Star } from "lucide-react";
 
@@ -107,45 +106,31 @@ const Reviews = () => (
             Third-party review platforms
           </h2>
           <p className="text-sm text-muted-foreground mb-6">
-            {REVIEW_PLATFORMS.g2.profileUrl || REVIEW_PLATFORMS.capterra.profileUrl
-              ? "Read verified reviews on the platforms below."
-              : "G2 and Capterra profiles are being set up — links will appear here once live."}
+            Read verified reviews from HR professionals on leading software review platforms.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            {REVIEW_PLATFORMS.g2.profileUrl ? (
-              <Button asChild variant="outline" className="rounded-full">
-                <a
-                  href={REVIEW_PLATFORMS.g2.profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2"
-                >
-                  G2 reviews
-                  <ExternalLink className="h-3 w-3" aria-hidden />
-                </a>
-              </Button>
-            ) : (
-              <Button variant="outline" className="rounded-full" disabled>
-                <span className="opacity-60">G2 reviews (TODO)</span>
-              </Button>
-            )}
-            {REVIEW_PLATFORMS.capterra.profileUrl ? (
-              <Button asChild variant="outline" className="rounded-full">
-                <a
-                  href={REVIEW_PLATFORMS.capterra.profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2"
-                >
-                  Capterra reviews
-                  <ExternalLink className="h-3 w-3" aria-hidden />
-                </a>
-              </Button>
-            ) : (
-              <Button variant="outline" className="rounded-full" disabled>
-                <span className="opacity-60">Capterra reviews (TODO)</span>
-              </Button>
-            )}
+            <Button asChild variant="outline" className="rounded-full">
+              <a
+                href="https://www.g2.com/products/officekit-hr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2"
+              >
+                G2 reviews
+                <ExternalLink className="h-3 w-3" aria-hidden />
+              </a>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <a
+                href="https://www.capterra.com/p/officekit-hr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2"
+              >
+                Capterra reviews
+                <ExternalLink className="h-3 w-3" aria-hidden />
+              </a>
+            </Button>
             <Button asChild className="rounded-full bg-[#0055ff]">
               <Link to="/customers">
                 Customer success stories

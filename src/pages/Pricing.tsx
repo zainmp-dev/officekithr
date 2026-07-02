@@ -41,7 +41,7 @@ const PLANS = SITE_PRICING.plans.map((plan) => ({
             "Training management",
             "Grievance management",
           ],
-})) ;
+}));
 
 const TIER_STYLES = {
   silver: {

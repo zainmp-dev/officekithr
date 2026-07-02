@@ -86,6 +86,8 @@ const KnowledgeSlugPage = lazy(() => import("./pages/knowledge/KnowledgeHub"));
 const GuidesHub = lazy(() => import("./pages/guides/GuidesHub"));
 const GuidePage = lazy(() => import("./pages/guides/GuidePage"));
 const ArticlePostPage = lazy(() => import("./pages/articles/ArticlePostPage"));
+const Security = lazy(() => import("./pages/Security"));
+const Accessibility = lazy(() => import("./pages/Accessibility"));
 const HRPopup = lazy(() =>
   import("./components/HRPopup").then((m) => ({ default: m.HRPopup }))
 );
@@ -272,6 +274,8 @@ const AppRoutes = () => {
 
           <Route path="/customers" element={<Customers />} />
           <Route path="/reviews" element={<Reviews />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/tools" element={<ToolsHub />} />
           <Route path="/tools/:slug" element={<ToolPage />} />
           <Route path="/knowledge" element={<KnowledgeIndex />} />
