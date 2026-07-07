@@ -59,7 +59,11 @@ const Blog = () => {
         });
     };
 
-    return scheduleDeferred(warmCache, { timeout: 1500 });
+    const cleanup = scheduleDeferred(warmCache, { timeout: 1500 });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, []);
 
   const handlePostHover = (post: BlogPost) => {
