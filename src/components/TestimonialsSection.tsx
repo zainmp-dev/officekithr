@@ -1,9 +1,354 @@
-import { Star, Quote } from "lucide-react";
+import { Pause, Play, Quote, Star, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { TESTIMONIALS } from "@/data/testimonials-data";
 import type { Testimonial } from "@/data/testimonials-data";
 import { TestimonialAvatar } from "@/components/TestimonialAvatar";
 import { FadeUpOnce } from "@/components/motion/FadeUpOnce";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+
+const TAP_FLASH_MS = 450;
+
+function formatClock(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  const s = Math.floor(seconds);
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${String(r).padStart(2, "0")}`;
+}
+
+const VIDEO_SRC = "/bosq-testimonial.mp4";
+
+async function playWithSoundFallback(video: HTMLVideoElement) {
+  video.muted = false;
+  video.volume = 1;
+  try {
+    await video.play();
+    return false;
+  } catch {
+    video.muted = true;
+    try {
+      await video.play();
+    } catch {
+      /* ignored */
+    }
+    return true;
+  }
+}
+
+function ReelVideoCard({
+  src = VIDEO_SRC,
+  poster,
+  hook = "How Bosq scaled HR with OfficeKit",
+}: {
+  src?: string;
+  poster?: string;
+  hook?: string;
+}) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const seekTrackRef = useRef<HTMLDivElement | null>(null);
+  const iconTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTapAt = useRef(0);
+  const isSeeking = useRef(false);
+  const lastTick = useRef(0);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [tapIcon, setTapIcon] = useState<"play" | "pause" | null>(null);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const progress = useMemo(() => {
+    if (!duration) return 0;
+    return Math.min(1, Math.max(0, current / duration));
+  }, [current, duration]);
+
+  const flashIcon = (kind: "play" | "pause") => {
+    setTapIcon(kind);
+    if (iconTimer.current) clearTimeout(iconTimer.current);
+    iconTimer.current = setTimeout(() => setTapIcon(null), TAP_FLASH_MS);
+  };
+
+  const seekFromClientX = (clientX: number) => {
+    const video = videoRef.current;
+    const track = seekTrackRef.current;
+    if (!video || !track || !duration) return;
+    const rect = track.getBoundingClientRect();
+    const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    video.currentTime = pct * duration;
+    setCurrent(video.currentTime);
+  };
+
+  // Near-viewport: attach src (no download until then)
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node || shouldLoad) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShouldLoad(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "240px 0px", threshold: 0.01 }
+    );
+
+    io.observe(node);
+    return () => io.disconnect();
+  }, [shouldLoad]);
+
+  // Media events — only after src is attached
+  useEffect(() => {
+    if (!shouldLoad) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.volume = 1;
+    video.load();
+
+    const onLoaded = () => setDuration(video.duration || 0);
+    const onTime = () => {
+      if (isSeeking.current) return;
+      const now = performance.now();
+      // Cap UI updates ~4/sec — timeupdate can fire 4–20x/sec
+      if (now - lastTick.current < 250) return;
+      lastTick.current = now;
+      setCurrent(video.currentTime || 0);
+    };
+    const onPlay = () => {
+      setIsPlaying(true);
+      setIsBuffering(false);
+    };
+    const onPause = () => setIsPlaying(false);
+    const onVolume = () => setIsMuted(video.muted || video.volume === 0);
+    const onWaiting = () => setIsBuffering(true);
+    const onPlaying = () => setIsBuffering(false);
+
+    video.addEventListener("loadedmetadata", onLoaded);
+    video.addEventListener("timeupdate", onTime);
+    video.addEventListener("play", onPlay);
+    video.addEventListener("pause", onPause);
+    video.addEventListener("volumechange", onVolume);
+    video.addEventListener("waiting", onWaiting);
+    video.addEventListener("playing", onPlaying);
+    return () => {
+      video.removeEventListener("loadedmetadata", onLoaded);
+      video.removeEventListener("timeupdate", onTime);
+      video.removeEventListener("play", onPlay);
+      video.removeEventListener("pause", onPause);
+      video.removeEventListener("volumechange", onVolume);
+      video.removeEventListener("waiting", onWaiting);
+      video.removeEventListener("playing", onPlaying);
+      if (iconTimer.current) clearTimeout(iconTimer.current);
+    };
+  }, [shouldLoad]);
+
+  // Play / pause when in view — start muted for reliable autoplay + less bandwidth waste on blocked sound
+  useEffect(() => {
+    if (!shouldLoad) return;
+    const node = containerRef.current;
+    const video = videoRef.current;
+    if (!node || !video) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        const inView = !!entry?.isIntersecting && entry.intersectionRatio >= 0.55;
+        if (inView) {
+          video.muted = true;
+          setIsMuted(true);
+          void video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: [0, 0.55, 1] }
+    );
+
+    io.observe(node);
+    return () => io.disconnect();
+  }, [shouldLoad]);
+
+  const togglePlay = async () => {
+    const now = Date.now();
+    if (now - lastTapAt.current < 280) return;
+    lastTapAt.current = now;
+
+    if (!shouldLoad) setShouldLoad(true);
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      flashIcon("play");
+      const muted = await playWithSoundFallback(video);
+      setIsMuted(muted);
+    } else {
+      flashIcon("pause");
+      video.pause();
+    }
+  };
+
+  const toggleMute = (e: MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.muted) {
+      video.muted = false;
+      if (video.volume === 0) video.volume = 1;
+      void video.play().catch(() => {});
+      setIsMuted(false);
+    } else {
+      video.muted = true;
+      setIsMuted(true);
+    }
+  };
+
+  const onSeekPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    isSeeking.current = true;
+    seekFromClientX(e.clientX);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onSeekPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isSeeking.current) return;
+    e.stopPropagation();
+    seekFromClientX(e.clientX);
+  };
+
+  const onSeekPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isSeeking.current) return;
+    e.stopPropagation();
+    isSeeking.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignored
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className="feature-card group relative isolate h-full min-h-[420px] w-full overflow-hidden bg-neutral-900 p-0 sm:min-h-[480px]"
+    >
+      <video
+        ref={videoRef}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        {...(shouldLoad ? { src } : {})}
+        poster={poster}
+        playsInline
+        muted
+        loop
+        preload="none"
+        disablePictureInPicture
+      />
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/55" />
+
+      {isBuffering && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div className="h-9 w-9 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={togglePlay}
+        className="absolute inset-0 z-10 cursor-pointer"
+        aria-label={isPlaying ? "Pause video" : "Play video"}
+      />
+
+      <div className="pointer-events-none absolute left-4 right-14 top-4 z-20">
+        <p className="truncate text-lg font-semibold leading-snug text-white drop-shadow-sm sm:text-xl">
+          {hook.split(/(Bosq)/i).map((part, i) =>
+            /^Bosq$/i.test(part) ? (
+              <span key={i} style={{ color: "#f37422" }}>
+                {part}
+              </span>
+            ) : (
+              <span key={i}>{part}</span>
+            )
+          )}
+        </p>
+      </div>
+
+      <div
+        className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-150 ${
+          tapIcon || !isPlaying ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="rounded-full bg-black/45 p-4 backdrop-blur-sm">
+          {tapIcon === "pause" ? (
+            <Pause className="h-8 w-8 text-white" fill="white" aria-hidden />
+          ) : (
+            <Play className="ml-0.5 h-8 w-8 text-white" fill="white" aria-hidden />
+          )}
+        </div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 z-30 px-3 pb-3 pt-8">
+        <div className="mb-2 flex items-end justify-between gap-3">
+          <p className="pointer-events-none text-xs font-medium tabular-nums text-white/90">
+            {formatClock(current)}
+            <span className="text-white/50"> / {formatClock(duration)}</span>
+          </p>
+          <button
+            type="button"
+            onClick={toggleMute}
+            className="rounded-full bg-black/50 p-2.5 text-white backdrop-blur-sm ring-1 ring-white/15 transition hover:bg-black/65"
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-5 w-5" aria-hidden />
+            ) : (
+              <Volume2 className="h-5 w-5" aria-hidden />
+            )}
+          </button>
+        </div>
+
+        <div
+          ref={seekTrackRef}
+          role="slider"
+          aria-label="Seek video"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+          tabIndex={0}
+          onPointerDown={onSeekPointerDown}
+          onPointerMove={onSeekPointerMove}
+          onPointerUp={onSeekPointerUp}
+          onPointerCancel={onSeekPointerUp}
+          onClick={(e) => e.stopPropagation()}
+          className="group/seek relative h-5 w-full cursor-pointer touch-none"
+        >
+          <div className="absolute left-0 right-0 top-1/2 h-[3px] -translate-y-1/2 overflow-hidden rounded-full bg-white/30 transition-[height] group-hover/seek:h-1.5">
+            <div
+              className="h-full rounded-full bg-white"
+              style={{ width: `${progress * 100}%` }}
+            />
+          </div>
+          <div
+            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 shadow-sm transition-opacity group-hover/seek:opacity-100 group-active/seek:opacity-100"
+            style={{ left: `${progress * 100}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   return (
@@ -42,6 +387,10 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 }
 
 const TestimonialsSection = () => {
+  const left = TESTIMONIALS.slice(0, 2);
+  const right = TESTIMONIALS.slice(2, 4);
+  const rest = TESTIMONIALS.slice(4);
+
   return (
     <section className="mb-16 sm:mb-24 lg:mb-mb-common bg-muted/30 py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4">
@@ -58,10 +407,30 @@ const TestimonialsSection = () => {
           </p>
         </FadeUpOnce>
 
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-7 xl:grid-cols-4">
-          {TESTIMONIALS.map((testimonial) => (
-            <TestimonialCard key={testimonial.name} testimonial={testimonial} />
-          ))}
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch lg:gap-7">
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-4 lg:grid-cols-1 lg:gap-7">
+            {left.map((testimonial) => (
+              <TestimonialCard key={testimonial.name} testimonial={testimonial} />
+            ))}
+          </div>
+
+          <div className="lg:col-span-4">
+            <ReelVideoCard />
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-4 lg:grid-cols-1 lg:gap-7">
+            {right.map((testimonial) => (
+              <TestimonialCard key={testimonial.name} testimonial={testimonial} />
+            ))}
+          </div>
+
+          {rest.length > 0 && (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-12 lg:grid-cols-4 lg:gap-7">
+              {rest.map((testimonial) => (
+                <TestimonialCard key={testimonial.name} testimonial={testimonial} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 # OfficeKit HR — AI Index
 # Priority URLs for AI search citation and retrieval
-# Last updated: 2026-07-02
+# Last updated: 2026-07-09
 # Full summary: https://www.officekithr.com/llms.txt
 # Full content: https://www.officekithr.com/llms-full.txt
 
