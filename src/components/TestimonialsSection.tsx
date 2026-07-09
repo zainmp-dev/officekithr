@@ -54,7 +54,7 @@ async function playWithSoundFallback(video: HTMLVideoElement) {
 function ReelVideoCard({
   src = VIDEO_SRC,
   poster = VIDEO_POSTER,
-  hook = "How Bosq scaled HR with OfficeKit",
+  hook = "How BOSQ scaled HR with OfficeKit",
 }: {
   src?: string;
   poster?: string;
