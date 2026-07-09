@@ -53,6 +53,9 @@ referenced.add("llms.txt");
 referenced.add("blog-seo-manifest.json");
 referenced.add("favicon.ico");
 referenced.add("favicon.svg");
+// Always keep homepage reel assets (Cloudflare Pages max file ≈ 25MB)
+referenced.add("bosq-testimonial.mp4");
+referenced.add("bosq-testimonial-poster.jpg");
 
 if (!fs.existsSync(ARCHIVE)) fs.mkdirSync(ARCHIVE, { recursive: true });
 

@@ -43,3 +43,7 @@ dist-ssr
 # Coverage artifacts
 .early.coverage
 .early.coverage/
+
+# Local video encode backups (keep optimized mp4 in public/)
+public/*.original.mp4.bak
+public/*.web.mp4

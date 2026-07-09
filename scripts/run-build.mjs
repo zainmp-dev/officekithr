@@ -27,6 +27,12 @@ try {
   console.warn("[build] prune-public-assets skipped:", e.message);
 }
 run("npx vite build");
+try {
+  run("node scripts/verify-video-assets.mjs");
+} catch (e) {
+  console.error("[build] Video asset verification failed:", e.message);
+  process.exit(1);
+}
 if (process.env.STRIP_SOURCEMAPS === "1") {
   try {
     run("node scripts/strip-sourcemaps.mjs");

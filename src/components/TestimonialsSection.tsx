@@ -24,27 +24,36 @@ function formatClock(seconds: number): string {
 }
 
 const VIDEO_SRC = "/bosq-testimonial.mp4";
+const VIDEO_POSTER = "/bosq-testimonial-poster.jpg";
+
+async function playMuted(video: HTMLVideoElement) {
+  video.defaultMuted = true;
+  video.muted = true;
+  video.setAttribute("muted", "");
+  try {
+    await video.play();
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function playWithSoundFallback(video: HTMLVideoElement) {
   video.muted = false;
+  video.removeAttribute("muted");
   video.volume = 1;
   try {
     await video.play();
     return false;
   } catch {
-    video.muted = true;
-    try {
-      await video.play();
-    } catch {
-      /* ignored */
-    }
-    return true;
+    const ok = await playMuted(video);
+    return ok ? true : true;
   }
 }
 
 function ReelVideoCard({
   src = VIDEO_SRC,
-  poster,
+  poster = VIDEO_POSTER,
   hook = "How Bosq scaled HR with OfficeKit",
 }: {
   src?: string;
@@ -58,10 +67,12 @@ function ReelVideoCard({
   const lastTapAt = useRef(0);
   const isSeeking = useRef(false);
   const lastTick = useRef(0);
+  const wantPlayRef = useRef(false);
   const [shouldLoad, setShouldLoad] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isBuffering, setIsBuffering] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [tapIcon, setTapIcon] = useState<"play" | "pause" | null>(null);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -99,7 +110,7 @@ function ReelVideoCard({
           io.disconnect();
         }
       },
-      { rootMargin: "240px 0px", threshold: 0.01 }
+      { rootMargin: "320px 0px", threshold: 0.01 }
     );
 
     io.observe(node);
@@ -112,15 +123,25 @@ function ReelVideoCard({
     const video = videoRef.current;
     if (!video) return;
 
+    setHasError(false);
+    video.defaultMuted = true;
     video.muted = true;
     video.volume = 1;
+    video.setAttribute("muted", "");
     video.load();
 
-    const onLoaded = () => setDuration(video.duration || 0);
+    const onLoaded = () => {
+      setDuration(Number.isFinite(video.duration) ? video.duration : 0);
+      setIsBuffering(false);
+      if (wantPlayRef.current) {
+        void playMuted(video).then((ok) => {
+          if (ok) setIsMuted(true);
+        });
+      }
+    };
     const onTime = () => {
       if (isSeeking.current) return;
       const now = performance.now();
-      // Cap UI updates ~4/sec — timeupdate can fire 4–20x/sec
       if (now - lastTick.current < 250) return;
       lastTick.current = now;
       setCurrent(video.currentTime || 0);
@@ -128,11 +149,18 @@ function ReelVideoCard({
     const onPlay = () => {
       setIsPlaying(true);
       setIsBuffering(false);
+      setHasError(false);
     };
     const onPause = () => setIsPlaying(false);
     const onVolume = () => setIsMuted(video.muted || video.volume === 0);
     const onWaiting = () => setIsBuffering(true);
     const onPlaying = () => setIsBuffering(false);
+    const onCanPlay = () => setIsBuffering(false);
+    const onError = () => {
+      setHasError(true);
+      setIsBuffering(false);
+      setIsPlaying(false);
+    };
 
     video.addEventListener("loadedmetadata", onLoaded);
     video.addEventListener("timeupdate", onTime);
@@ -141,6 +169,8 @@ function ReelVideoCard({
     video.addEventListener("volumechange", onVolume);
     video.addEventListener("waiting", onWaiting);
     video.addEventListener("playing", onPlaying);
+    video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("error", onError);
     return () => {
       video.removeEventListener("loadedmetadata", onLoaded);
       video.removeEventListener("timeupdate", onTime);
@@ -149,11 +179,13 @@ function ReelVideoCard({
       video.removeEventListener("volumechange", onVolume);
       video.removeEventListener("waiting", onWaiting);
       video.removeEventListener("playing", onPlaying);
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("error", onError);
       if (iconTimer.current) clearTimeout(iconTimer.current);
     };
-  }, [shouldLoad]);
+  }, [shouldLoad, src]);
 
-  // Play / pause when in view — start muted for reliable autoplay + less bandwidth waste on blocked sound
+  // Play / pause when in view — muted autoplay (works across browsers)
   useEffect(() => {
     if (!shouldLoad) return;
     const node = containerRef.current;
@@ -163,16 +195,16 @@ function ReelVideoCard({
     const io = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        const inView = !!entry?.isIntersecting && entry.intersectionRatio >= 0.55;
+        const inView = !!entry?.isIntersecting && entry.intersectionRatio >= 0.4;
+        wantPlayRef.current = inView;
         if (inView) {
-          video.muted = true;
           setIsMuted(true);
-          void video.play().catch(() => {});
+          void playMuted(video);
         } else {
           video.pause();
         }
       },
-      { threshold: [0, 0.55, 1] }
+      { threshold: [0, 0.4, 1] }
     );
 
     io.observe(node);
@@ -184,19 +216,40 @@ function ReelVideoCard({
     if (now - lastTapAt.current < 280) return;
     lastTapAt.current = now;
 
-    if (!shouldLoad) setShouldLoad(true);
+    if (!shouldLoad) {
+      wantPlayRef.current = true;
+      setShouldLoad(true);
+      flashIcon("play");
+      return;
+    }
 
     const video = videoRef.current;
     if (!video) return;
 
     if (video.paused) {
       flashIcon("play");
+      wantPlayRef.current = true;
       const muted = await playWithSoundFallback(video);
       setIsMuted(muted);
     } else {
       flashIcon("pause");
+      wantPlayRef.current = false;
       video.pause();
     }
+  };
+
+  const retryLoad = (e: MouseEvent) => {
+    e.stopPropagation();
+    setHasError(false);
+    wantPlayRef.current = true;
+    setShouldLoad(true);
+    const video = videoRef.current;
+    if (!video) return;
+    // Force remount of source by reloading after React commits
+    requestAnimationFrame(() => {
+      video.load();
+      void playMuted(video);
+    });
   };
 
   const toggleMute = (e: MouseEvent) => {
@@ -205,11 +258,15 @@ function ReelVideoCard({
     if (!video) return;
     if (video.muted) {
       video.muted = false;
+      video.removeAttribute("muted");
       if (video.volume === 0) video.volume = 1;
-      void video.play().catch(() => {});
+      void video.play().catch(() => {
+        void playMuted(video).then(() => setIsMuted(true));
+      });
       setIsMuted(false);
     } else {
       video.muted = true;
+      video.setAttribute("muted", "");
       setIsMuted(true);
     }
   };
@@ -247,20 +304,35 @@ function ReelVideoCard({
       <video
         ref={videoRef}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-        {...(shouldLoad ? { src } : {})}
         poster={poster}
         playsInline
         muted
         loop
-        preload="none"
+        preload={shouldLoad ? "metadata" : "none"}
         disablePictureInPicture
-      />
+        controls={false}
+      >
+        {shouldLoad ? <source src={src} type="video/mp4" /> : null}
+      </video>
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/55" />
 
-      {isBuffering && (
+      {(isBuffering || (shouldLoad && !isPlaying && !hasError && duration === 0)) && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <div className="h-9 w-9 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+        </div>
+      )}
+
+      {hasError && (
+        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-black/55 px-4 text-center">
+          <p className="text-sm text-white/90">Video couldn’t load.</p>
+          <button
+            type="button"
+            onClick={retryLoad}
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-neutral-900"
+          >
+            Retry
+          </button>
         </div>
       )}
 
