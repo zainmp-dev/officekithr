@@ -70,7 +70,7 @@ function ReelVideoCard({
   const wantPlayRef = useRef(false);
   const [shouldLoad, setShouldLoad] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [tapIcon, setTapIcon] = useState<"play" | "pause" | null>(null);
@@ -124,19 +124,14 @@ function ReelVideoCard({
     if (!video) return;
 
     setHasError(false);
-    video.defaultMuted = true;
-    video.muted = true;
     video.volume = 1;
-    video.setAttribute("muted", "");
     video.load();
 
     const onLoaded = () => {
       setDuration(Number.isFinite(video.duration) ? video.duration : 0);
       setIsBuffering(false);
       if (wantPlayRef.current) {
-        void playMuted(video).then((ok) => {
-          if (ok) setIsMuted(true);
-        });
+        void playWithSoundFallback(video).then((muted) => setIsMuted(muted));
       }
     };
     const onTime = () => {
@@ -185,7 +180,7 @@ function ReelVideoCard({
     };
   }, [shouldLoad, src]);
 
-  // Play / pause when in view — muted autoplay (works across browsers)
+  // Play with sound when this reel scrolls into view; mute only if browser blocks it
   useEffect(() => {
     if (!shouldLoad) return;
     const node = containerRef.current;
@@ -198,8 +193,7 @@ function ReelVideoCard({
         const inView = !!entry?.isIntersecting && entry.intersectionRatio >= 0.4;
         wantPlayRef.current = inView;
         if (inView) {
-          setIsMuted(true);
-          void playMuted(video);
+          void playWithSoundFallback(video).then((muted) => setIsMuted(muted));
         } else {
           video.pause();
         }
@@ -245,10 +239,9 @@ function ReelVideoCard({
     setShouldLoad(true);
     const video = videoRef.current;
     if (!video) return;
-    // Force remount of source by reloading after React commits
     requestAnimationFrame(() => {
       video.load();
-      void playMuted(video);
+      void playWithSoundFallback(video).then((muted) => setIsMuted(muted));
     });
   };
 
@@ -306,7 +299,6 @@ function ReelVideoCard({
         className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         poster={poster}
         playsInline
-        muted
         loop
         preload={shouldLoad ? "metadata" : "none"}
         disablePictureInPicture
