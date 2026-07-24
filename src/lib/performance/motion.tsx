@@ -20,9 +20,13 @@ export function MotionProvider({ children }: { children: ReactNode }) {
 /** Use `m` (not `motion`) under LazyMotion strict mode. */
 export {
   m,
+  animate,
   AnimatePresence,
   useScroll,
   useTransform,
+  useMotionValue,
+  useMotionTemplate,
+  useMotionValueEvent,
   useInView,
   type MotionValue,
   type Variants,

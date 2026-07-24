@@ -7,6 +7,9 @@ import {
 } from "@/lib/flowpilot-blog-api";
 import { BlogPost } from "../types";
 
+/** Listing page size — keep first paint to one API request. */
+export const BLOG_LISTING_PAGE_SIZE = 10;
+
 interface FlowPilotBlog {
   id: string;
   title: string;
@@ -44,6 +47,10 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 
 const detailCache = new Map<string, BlogPost>();
 const inflightDetail = new Map<string, Promise<BlogPost | null>>();
+
+const pageCache = new Map<string, BlogPostsPage>();
+const pageCacheTime = new Map<string, number>();
+const pageInflight = new Map<string, Promise<BlogPostsPage>>();
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
@@ -102,10 +109,39 @@ function patchCachedPost(updated: BlogPost): void {
   postsCache = postsCache.map((p) => (p._id === updated._id ? updated : p));
 }
 
-async function fetchPublishedBlogsPage(page: number): Promise<FlowPilotBlogsResponse | null> {
+function pageCacheKey(page: number, limit: number): string {
+  return `${page}:${limit}`;
+}
+
+/** Merge a page of posts into the full-list cache without waiting for every page. */
+function mergeIntoPostsCache(posts: BlogPost[]): void {
+  if (!posts.length) return;
+  if (!postsCache) {
+    postsCache = posts;
+    cacheTime = Date.now();
+    return;
+  }
+
+  const byId = new Map(postsCache.map((p) => [p._id, p]));
+  for (const post of posts) byId.set(post._id, post);
+  postsCache = Array.from(byId.values());
+  cacheTime = Date.now();
+}
+
+export type BlogPostsPage = {
+  posts: BlogPost[];
+  currentPage: number;
+  totalPages: number;
+  totalBlogs: number;
+};
+
+async function fetchPublishedBlogsPage(
+  page: number,
+  limit = FLOWPILOT_BLOG_PAGE_SIZE,
+): Promise<FlowPilotBlogsResponse | null> {
   const url = flowpilotBlogUrl(env.blogApiUrl, {
     page,
-    limit: FLOWPILOT_BLOG_PAGE_SIZE,
+    limit,
   });
 
   const res = await fetch(url, {
@@ -117,16 +153,86 @@ async function fetchPublishedBlogsPage(page: number): Promise<FlowPilotBlogsResp
   return res.json() as Promise<FlowPilotBlogsResponse>;
 }
 
+export function getCachedPostsPage(
+  page = 1,
+  limit = BLOG_LISTING_PAGE_SIZE,
+): BlogPostsPage | null {
+  return pageCache.get(pageCacheKey(page, limit)) ?? null;
+}
+
+/** Fetch a single page of published blogs from the FlowPilot API (cached + deduped). */
+export async function getPostsPage(
+  page = 1,
+  limit = BLOG_LISTING_PAGE_SIZE,
+): Promise<BlogPostsPage> {
+  const key = pageCacheKey(page, limit);
+  const cached = pageCache.get(key);
+  const cachedAt = pageCacheTime.get(key) ?? 0;
+  if (cached && Date.now() - cachedAt < CACHE_TTL_MS) {
+    return cached;
+  }
+
+  const existing = pageInflight.get(key);
+  if (existing) return existing;
+
+  const promise = (async (): Promise<BlogPostsPage> => {
+    try {
+      const body = await fetchPublishedBlogsPage(page, limit);
+      if (!body?.success || !body.data?.blogs) {
+        return (
+          cached ?? { posts: [], currentPage: page, totalPages: 0, totalBlogs: 0 }
+        );
+      }
+
+      const result: BlogPostsPage = {
+        posts: body.data.blogs.map(mapFlowPilotBlog),
+        currentPage: body.data.currentPage || page,
+        totalPages: body.data.totalPages || 1,
+        totalBlogs: body.data.totalBlogs || body.data.blogs.length,
+      };
+
+      pageCache.set(key, result);
+      pageCacheTime.set(key, Date.now());
+      mergeIntoPostsCache(result.posts);
+      return result;
+    } catch {
+      return (
+        cached ?? { posts: [], currentPage: page, totalPages: 0, totalBlogs: 0 }
+      );
+    } finally {
+      pageInflight.delete(key);
+    }
+  })();
+
+  pageInflight.set(key, promise);
+  return promise;
+}
+
+/** Prefetch a page without blocking the caller. */
+export function prefetchPostsPage(
+  page = 1,
+  limit = BLOG_LISTING_PAGE_SIZE,
+): void {
+  void getPostsPage(page, limit);
+}
+
 async function fetchFlowPilotBlogs(): Promise<BlogPost[]> {
   const posts: BlogPost[] = [];
   let page = 1;
   let totalPages = 1;
 
   while (page <= totalPages) {
-    const body = await fetchPublishedBlogsPage(page);
+    const body = await fetchPublishedBlogsPage(page, FLOWPILOT_BLOG_PAGE_SIZE);
     if (!body?.success || !body.data?.blogs) break;
 
-    posts.push(...body.data.blogs.map(mapFlowPilotBlog));
+    const mapped = body.data.blogs.map(mapFlowPilotBlog);
+    posts.push(...mapped);
+    pageCache.set(pageCacheKey(page, FLOWPILOT_BLOG_PAGE_SIZE), {
+      posts: mapped,
+      currentPage: body.data.currentPage || page,
+      totalPages: body.data.totalPages || 1,
+      totalBlogs: body.data.totalBlogs || mapped.length,
+    });
     totalPages = body.data.totalPages || 1;
     page += 1;
   }

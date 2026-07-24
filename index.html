@@ -25,12 +25,9 @@
     html{scroll-behavior:smooth}
     body{margin:0;background:#01004f;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     #root{position:relative;z-index:1;min-height:100vh;isolation:isolate}
+    /* Blue hero paint only — no device mockup flash before React mounts */
     .hero-lcp-placeholder{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#0055ff 0%,#01004f 55%);overflow:hidden}
     .hero-lcp-placeholder.is-hidden{display:none}
-    .hero-lcp-placeholder__img--desktop{position:absolute;left:50%;bottom:-6vh;transform:translateX(-50%);width:min(940px,88vw);height:auto;max-height:70vh;object-fit:contain;display:none}
-    .hero-lcp-placeholder__img--mobile{position:absolute;left:50%;bottom:6vh;transform:translateX(-50%);width:240px;height:auto;max-height:62vh;object-fit:contain;display:none}
-    @media (min-width:768px){.hero-lcp-placeholder__img--desktop{display:block}}
-    @media (max-width:767px){.hero-lcp-placeholder__img--mobile{display:block}}
     h1{font-weight:700;line-height:1.15}
     @keyframes hero-fade-up{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
     .hero-fade-up{opacity:0;animation:hero-fade-up .6s cubic-bezier(.22,1,.36,1) forwards;will-change:transform,opacity}
@@ -43,18 +40,8 @@
     @media (prefers-reduced-motion:reduce){.hero-fade-up{animation:none;opacity:1;transform:none}.cta-lift:hover{transform:none}}
   </style>
   <link rel="preload" as="image" href="/BG-480.webp" fetchpriority="high" type="image/webp" media="(max-width: 767px)" />
-  <link
-    rel="preload"
-    as="image"
-    href="/mobile-mockup-240.webp"
-    imagesrcset="/mobile-mockup-240.webp 240w, /mobile-mockup-320.webp 320w"
-    imagesizes="240px"
-    fetchpriority="high"
-    type="image/webp"
-    media="(max-width: 767px)"
-  />
   <link rel="preload" as="image" href="/BG.webp" fetchpriority="high" type="image/webp" media="(min-width: 768px)" />
-  <link rel="preload" as="image" href="/dashboardok-768.webp" fetchpriority="high" type="image/webp" media="(min-width: 768px)" />
+  <link rel="preload" as="image" href="/hero-tablet-mockup.png" fetchpriority="high" type="image/png" media="(min-width: 768px)" />
   <link rel="preload" as="image" href="/NavLogo-108.webp" fetchpriority="low" type="image/webp" imagesizes="108px" />
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
   <link rel="preconnect" href="https://app.syncoraai.com" crossorigin />
@@ -65,30 +52,7 @@
   </script>
 </head>
 <body>
-  <div class="hero-lcp-placeholder" aria-hidden="true">
-    <img
-      class="hero-lcp-placeholder__img--desktop"
-      src="/dashboardok-768.webp"
-      srcset="/dashboardok-768.webp 768w, /dashboardok-1024.webp 1024w, /dashboardok.webp 1440w"
-      sizes="(min-width: 1280px) 700px, (min-width: 1024px) 72vw, 92vw"
-      alt="OfficeKit HR dashboard overview on desktop"
-      width="1024"
-      height="697"
-      fetchpriority="high"
-      decoding="async"
-    />
-    <img
-      class="hero-lcp-placeholder__img--mobile"
-      src="/mobile-mockup-240.webp"
-      srcset="/mobile-mockup-240.webp 240w, /mobile-mockup-320.webp 320w"
-      sizes="240px"
-      alt=""
-      width="240"
-      height="480"
-      fetchpriority="high"
-      decoding="async"
-    />
-  </div>
+  <div class="hero-lcp-placeholder" aria-hidden="true"></div>
   <div id="root"></div>
   <!-- Crawlable fallback when JS is disabled or before hydration (removed after React mounts). -->
   <noscript>

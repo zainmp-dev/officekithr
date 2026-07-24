@@ -26,7 +26,7 @@ const HUB_FAQS = [
   {
     question: "Which industries does OfficeKit HR serve?",
     answer:
-      "OfficeKit HR serves fintech, healthcare, IT services, retail, hospitality, manufacturing, education, logistics, real estate, and banking & BFSI — with dedicated industry pages for each vertical.",
+      "OfficeKit HR serves manufacturing, healthcare, real estate, apparel & textile, fintech, IT & software, hospitality, automotive, retail, logistics, agriculture, education, and banking & BFSI — with dedicated industry pages for each vertical.",
   },
 ];
 
@@ -34,8 +34,8 @@ const industryPages = Object.values(INDUSTRY_PAGES);
 
 const IndustriesHub = () => (
   <PageShell
-    title="HRMS by Industry | Fintech, Healthcare, Retail & More — OfficeKit HR"
-    description="Industry-specific HRMS for fintech, healthcare, IT, retail, hospitality, manufacturing, education, logistics, real estate, and BFSI. India and GCC payroll compliance."
+    title="HRMS by Industry | Manufacturing, Healthcare, Retail & More — OfficeKit HR"
+    description="Industry-specific HRMS for manufacturing, healthcare, real estate, apparel, fintech, IT, hospitality, automotive, retail, logistics, agriculture, education, and BFSI."
     path="/industries"
     faqs={HUB_FAQS}
     schemaNodes={[
@@ -51,23 +51,23 @@ const IndustriesHub = () => (
       <SeoHeroBanner
         eyebrow="Industry solutions"
         title="HRMS built for your industry"
-        subtitle="Purpose-built workforce management for fintech, healthcare, IT, retail, and more — with India and GCC statutory payroll."
+        subtitle="Purpose-built workforce management for manufacturing, healthcare, retail, IT, and more — with India and GCC statutory payroll."
         className="pt-40 sm:pt-44 md:pt-48"
       >
         <Button asChild className="btn-cta h-11 group">
           <Link to="/contact">
-            Book a demo
+            Book a Free Demo
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </Button>
         <Button asChild variant="outline" className="h-11">
-          <Link to="/pricing">View pricing</Link>
+          <Link to="/contact">Talk to Our Experts</Link>
         </Button>
       </SeoHeroBanner>
 
       <main className="container mx-auto px-4 max-w-5xl py-12 md:py-16">
         <DirectAnswerBlock
-          answer="OfficeKit HR provides industry-specific HRMS solutions for fintech, healthcare, IT services, retail, hospitality, manufacturing, education, logistics, real estate, and BFSI — with shift management, variable pay, statutory payroll for India (PF, ESI, PT, TDS), and GCC compliance (WPS, GOSI, PIFSS) tailored to each sector's workforce needs."
+          answer="OfficeKit HR provides industry-specific HRMS solutions for manufacturing, healthcare, real estate, apparel & textile, fintech, IT & software, hospitality, automotive, retail, logistics, agriculture, education, and BFSI — with shift management, variable pay, statutory payroll for India (PF, ESI, PT, TDS), and GCC compliance (WPS, GOSI, PIFSS) tailored to each sector's workforce needs."
           definition={{
             term: "Industry HRMS",
             meaning:

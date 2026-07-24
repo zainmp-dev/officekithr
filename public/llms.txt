@@ -131,6 +131,9 @@ OfficeKit HR is an AI-powered HRMS (Human Resource Management System) for recrui
 - Education HRMS: /industries/hrms-for-education
 - Logistics HRMS: /industries/hrms-for-logistics
 - Real Estate HRMS: /industries/hrms-for-real-estate
+- Apparel & Textile HRMS: /industries/hrms-for-apparel-textile
+- Automotive HRMS: /industries/hrms-for-automotive
+- Agriculture HRMS: /industries/hrms-for-agriculture
 - BFSI HRMS: /industries/hrms-for-bfsi
 
 ## Pricing Model

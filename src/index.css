@@ -264,18 +264,15 @@ html[data-perf-mode="mobile"] .section-fade-in {
   }
 
   html {
-    scroll-behavior: smooth;
-    overflow-x: hidden;
+    /* auto — smooth conflicts with ScrollTrigger pin/scrub */
+    scroll-behavior: auto;
+    /* clip (not hidden) so sticky / pin still work */
+    overflow-x: clip;
   }
 
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
-  }
-
-  /* Prevent horizontal scrolling */
-  * {
-    max-width: 100%;
   }
 
   img,
@@ -354,6 +351,7 @@ html[data-perf-mode="mobile"] .section-fade-in {
   .marquee-track {
     display: flex;
     width: max-content;
+    max-width: none;
     animation: marquee-scroll var(--marquee-duration, 55s) linear infinite;
     will-change: transform;
   }
@@ -502,9 +500,9 @@ html[data-perf-mode="mobile"] .section-fade-in {
   top: 1rem !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  width: auto !important;
-  max-width: 450px !important;
-  min-width: 350px !important;
+  width: min(450px, calc(100vw - 2rem)) !important;
+  max-width: calc(100vw - 2rem) !important;
+  min-width: 0 !important;
 }
 
 .Toastify__toast {

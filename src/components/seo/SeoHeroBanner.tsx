@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { SEO_ASSETS } from "@/lib/seo/assets";
+import { cn } from "@/lib/utils";
 
 type SeoHeroBannerProps = {
   eyebrow?: string;
@@ -29,7 +30,10 @@ export function SeoHeroBanner({
 
   return (
     <section
-      className={`relative pt-28 pb-12 sm:pt-32 sm:pb-16 md:pb-20 bg-cover bg-center overflow-hidden ${className}`}
+      className={cn(
+        "relative overflow-hidden bg-cover bg-center pt-28 pb-12 sm:pt-32 sm:pb-16 md:pb-20",
+        className
+      )}
       style={{ backgroundImage: `url('${backgroundImage}')` }}
     >
       <div
@@ -42,23 +46,30 @@ export function SeoHeroBanner({
         )}
         <h1
           id={titleId}
-          className={`text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 ${
+          className={cn(
+            "mb-6 text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl",
             centered ? "mx-auto max-w-4xl" : "max-w-3xl"
-          }`}
+          )}
         >
           {title}
         </h1>
         {subtitle && (
           <p
-            className={`text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 ${
+            className={cn(
+              "mb-8 text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-xl",
               centered ? "mx-auto max-w-3xl" : "max-w-3xl"
-            }`}
+            )}
           >
             {subtitle}
           </p>
         )}
         {children && (
-          <div className={`flex flex-wrap gap-4 ${centered ? "justify-center" : ""}`}>
+          <div
+            className={cn(
+              "flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4",
+              centered && "items-stretch justify-center sm:items-center"
+            )}
+          >
             {children}
           </div>
         )}

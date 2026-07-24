@@ -11,6 +11,7 @@ import { SeoBreadcrumb } from "@/components/seo/SeoBreadcrumb";
 import { DirectAnswerBlock } from "@/components/seo/DirectAnswerBlock";
 import { breadcrumbSchema } from "@/seo/schema";
 import { Button } from "@/components/ui/button";
+import { PartnerLogo } from "@/components/ui/PartnerLogo";
 import { ArrowRight, Check, AlertTriangle } from "lucide-react";
 import NotFound from "@/pages/NotFound";
 
@@ -19,6 +20,9 @@ const IndustryPage = () => {
   const page = slug ? INDUSTRY_PAGES[slug] : undefined;
 
   if (!page) return <NotFound />;
+
+  const clientsWithLogos = page.clients.filter((c) => c.logo);
+  const clientsWithoutLogos = page.clients.filter((c) => !c.logo);
 
   return (
     <PageShell
@@ -41,16 +45,16 @@ const IndustryPage = () => {
           eyebrow="OfficeKit HR Industry Solutions"
           title={page.h1}
           subtitle={page.subtitle}
-          className="pt-40 sm:pt-44 md:pt-48"
+          className="pt-32 sm:pt-36 md:pt-40"
         >
           <Button asChild className="btn-cta h-11 group">
             <Link to="/contact">
-              Book a demo
+              Book a Free Demo
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </Button>
           <Button asChild variant="outline" className="h-11">
-            <Link to="/pricing">View pricing</Link>
+            <Link to="/contact">Talk to Our Experts</Link>
           </Button>
         </SeoHeroBanner>
 
@@ -68,8 +72,49 @@ const IndustryPage = () => {
           <DirectAnswerBlock answer={page.directAnswer} definition={page.definition} />
         </div>
 
+        {page.clients.length > 0 && (
+          <section className="py-12 bg-muted/20" aria-labelledby="trusted-heading">
+            <div className="container mx-auto px-4 max-w-5xl text-center">
+              <h2
+                id="trusted-heading"
+                className="text-2xl font-semibold text-foreground mb-3"
+              >
+                Trusted by leading businesses
+              </h2>
+              <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Organizations across this industry rely on OfficeKit HRMS to simplify workforce
+                management and automate HR operations.
+              </p>
+              {clientsWithLogos.length > 0 && (
+                <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-6 list-none p-0 m-0 mb-6">
+                  {clientsWithLogos.map((client) => (
+                    <li
+                      key={client.name}
+                      className="flex h-16 w-[8.5rem] items-center justify-center sm:h-[4.5rem] sm:w-40"
+                    >
+                      <PartnerLogo src={client.logo!} label={client.name} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {clientsWithoutLogos.length > 0 && (
+                <ul className="flex flex-wrap justify-center gap-2 list-none p-0 m-0">
+                  {clientsWithoutLogos.map((client) => (
+                    <li
+                      key={client.name}
+                      className="px-3 py-1.5 rounded-md border bg-card text-sm font-medium text-foreground"
+                    >
+                      {client.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
+        )}
+
         {page.highlights.length > 0 && (
-          <section className="py-12 bg-muted/20" aria-labelledby="highlights-heading">
+          <section className="py-12 bg-background" aria-labelledby="highlights-heading">
             <div className="container mx-auto px-4 max-w-4xl">
               <h2
                 id="highlights-heading"
@@ -93,7 +138,7 @@ const IndustryPage = () => {
         )}
 
         {page.sections.length > 0 && (
-          <section className="py-12 bg-background" aria-labelledby="industry-detail-heading">
+          <section className="py-12 bg-muted/20" aria-labelledby="industry-detail-heading">
             <div className="container mx-auto px-4 max-w-4xl space-y-10">
               <h2 id="industry-detail-heading" className="sr-only">
                 Industry overview
@@ -110,7 +155,7 @@ const IndustryPage = () => {
           </section>
         )}
 
-        <section className="py-16 bg-muted/20" aria-labelledby="challenges-heading">
+        <section className="py-16 bg-background" aria-labelledby="challenges-heading">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2
               id="challenges-heading"
@@ -133,7 +178,7 @@ const IndustryPage = () => {
         </section>
 
         {page.features.length > 0 && (
-          <section className="py-16 bg-background" aria-labelledby="features-heading">
+          <section className="py-16 bg-muted/20" aria-labelledby="features-heading">
             <div className="container mx-auto px-4 max-w-5xl">
               <h2
                 id="features-heading"
@@ -157,7 +202,7 @@ const IndustryPage = () => {
           </section>
         )}
 
-        <section className="py-12 bg-muted/20" aria-labelledby="facts-heading">
+        <section className="py-12 bg-background" aria-labelledby="facts-heading">
           <div className="container mx-auto px-4 max-w-5xl">
             <h2 id="facts-heading" className="sr-only">
               Key facts
@@ -166,7 +211,7 @@ const IndustryPage = () => {
           </div>
         </section>
 
-        <section className="py-16 bg-background" aria-labelledby="capabilities-heading">
+        <section className="py-16 bg-muted/20" aria-labelledby="capabilities-heading">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2
               id="capabilities-heading"
@@ -189,7 +234,7 @@ const IndustryPage = () => {
         </section>
 
         {page.compliancePoints.length > 0 && (
-          <section className="py-12 bg-muted/20" aria-labelledby="compliance-heading">
+          <section className="py-12 bg-background" aria-labelledby="compliance-heading">
             <div className="container mx-auto px-4 max-w-4xl text-center">
               <h2
                 id="compliance-heading"
@@ -211,14 +256,26 @@ const IndustryPage = () => {
           </section>
         )}
 
-        <section className="py-12 bg-background">
+        <section className="py-16 bg-muted/20">
           <div className="container mx-auto px-4 max-w-4xl text-center">
-            <Button asChild className="btn-cta h-11 group">
-              <Link to="/contact">
-                Book a free demo
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </Button>
+            <h2 className="text-2xl font-semibold text-foreground mb-3">
+              Ready to modernize your HR operations?
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Schedule a personalized demo and discover how OfficeKit HRMS can simplify workforce
+              management for your business.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button asChild className="btn-cta h-11 group">
+                <Link to="/contact">
+                  Schedule a Free Demo
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-11">
+                <Link to="/contact">Contact Sales</Link>
+              </Button>
+            </div>
           </div>
         </section>
 

@@ -32,13 +32,20 @@ const solutionsLinks = [
 
 const featuresLinks = [
   { name: "Recruitment Management", href: "/features/recruitment-management" },
+  { name: "Employee Management", href: "/features/employee-management" },
   { name: "Attendance and Leave", href: "/features/attendance-and-leave" },
+  { name: "Leave Management", href: "/features/leave-management" },
   { name: "Payroll and Compliance", href: "/features/payroll-and-compliance" },
   { name: "Performance Management", href: "/features/performance-appraisal" },
   { name: "Self Service Portal", href: "/features/self-service-portal" },
+  { name: "Task and Timesheet", href: "/features/task-and-timesheet" },
+  { name: "Claim and Reimbursement", href: "/features/claim-and-reimbursement" },
+  { name: "Loans and Advance", href: "/features/loans-and-advance" },
+  { name: "Document Management", href: "/features/document-management" },
   { name: "Exit Management", href: "/features/exit-management" },
   { name: "Mobile App", href: "/features/mobile-app" },
   { name: "Face Kit", href: "/features/face-kit" },
+  { name: "AI Pilot", href: "/features/ai-pilot" },
 ];
 
 const resourcesLinks = [
@@ -68,7 +75,7 @@ const Footer = () => {
   return (
     <>
       <PreFooterGeo />
-      <footer className="bg-gray-900 pt-p-tursioury pb-[32px] text-gray-100">
+      <footer className="bg-gray-900 pt-16 sm:pt-20 pb-8 text-gray-100">
         <div className="container mx-auto px-4">
           <div className="space-y-6">
             <Link to="/" className="flex items-center space-x-2">
@@ -107,7 +114,7 @@ const Footer = () => {
 
           <div className="border-t border-gray-700 opacity-50 my-6" />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 mt-12 mb-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 mt-12 mb-10">
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-white">Company</h3>
               <div className="space-y-3">
@@ -120,7 +127,22 @@ const Footer = () => {
 
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-white">Features</h3>
-              <div className="space-y-3">
+              <details className="group md:hidden">
+                <summary className="cursor-pointer list-none text-sm text-gray-400 hover:text-white [&::-webkit-details-marker]:hidden">
+                  <span className="inline-flex items-center gap-2">
+                    Browse all features
+                    <span className="text-xs transition group-open:rotate-180">▼</span>
+                  </span>
+                </summary>
+                <div className="mt-3 space-y-3">
+                  {featuresLinks.map((link) => (
+                    <Link key={link.href} to={link.href} className="block text-gray-300 hover:text-white transition-colors">
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+              <div className="hidden space-y-3 md:block">
                 {featuresLinks.map((link) => (
                   <Link key={link.href} to={link.href} className="block text-gray-300 hover:text-white transition-colors">
                     {link.name}
@@ -196,21 +218,24 @@ const Footer = () => {
               </div>
 
               <div className="pt-4">
-                <h4 className="text-sm font-semibold text-white mb-2">Stay updated</h4>
+                <h4 className="text-sm font-semibold text-white mb-3">Stay updated</h4>
                 <form
                   onSubmit={(e: FormEvent) => { e.preventDefault(); setEmail(""); }}
-                  className="flex flex-col gap-2 w-full"
+                  className="flex w-full flex-col gap-2.5"
                 >
                   <Input
                     type="email"
                     placeholder="Work email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 text-sm h-9 focus-visible:ring-gray-500"
+                    className="h-11 w-full rounded-xl border border-white/25 bg-white text-sm text-gray-900 placeholder:text-gray-500 shadow-sm focus-visible:border-[#0055ff] focus-visible:ring-2 focus-visible:ring-[#0055ff]/30"
                     required
                     aria-label="Email for newsletter"
                   />
-                  <Button type="submit" className="w-full bg-[#0055ff] hover:bg-[#0044cc] text-white h-9 text-sm">
+                  <Button
+                    type="submit"
+                    className="h-11 w-full rounded-xl bg-[#0055ff] text-sm font-semibold text-white hover:bg-[#0044cc]"
+                  >
                     Subscribe
                   </Button>
                 </form>

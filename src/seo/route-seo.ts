@@ -27,9 +27,10 @@ const defaultDesc =
 export const STATIC_ROUTES: RouteSeoConfig[] = [
   {
     path: "/",
-    title: "OfficeKit HR | AI-Powered HRMS for India, UAE & GCC",
+    title:
+      "AI-Powered HRMS for India, UAE & GCC Payroll | OfficeKit HR",
     description:
-      "Transform HR with OfficeKit — recruitment, payroll, attendance, performance, and self-service. Built for India, UAE, Kuwait, Saudi Arabia, and Qatar.",
+      "AI-powered HRMS for India, UAE & GCC payroll. Automate attendance, recruitment, statutory compliance, and WPS — trusted by 1,000+ businesses.",
     hreflang: [
       { lang: "en", path: "/" },
       { lang: "ar-AE", path: "/ae" },
@@ -68,51 +69,81 @@ export const STATIC_ROUTES: RouteSeoConfig[] = [
   },
   {
     path: "/features/payroll-and-compliance",
-    title: "Payroll & Compliance Software | India, UAE & GCC — OfficeKit HR",
+    title: "Payroll & Compliance Software | Best HRMS in India — OfficeKit",
     description:
-      "Statutory payroll for India (PF, ESI, PT, TDS) and GCC (UAE WPS, KSA GOSI, Kuwait PIFSS) with salary slips and audit-ready reports.",
+      "Automate salary processing, statutory deductions, WPS generation, and compliance reporting with OfficeKit Payroll & Compliance Software.",
   },
   {
     path: "/features/performance-appraisal",
-    title: "Performance Appraisal Software | India & GCC — OfficeKit HR",
+    title: "Performance Management Software | OfficeKit HR",
     description:
-      "OKRs, appraisal cycles, and 360° feedback for India and GCC teams. Performance management connected to OfficeKit HR.",
+      "Set goals, track KPIs, run appraisals, and manage employee development with OfficeKit Performance Management Software.",
   },
   {
     path: "/features/self-service-portal",
-    title: "Employee Self-Service Portal | India & UAE — OfficeKit HR",
+    title: "Employee Self-Service (ESS) Software | OfficeKit HR",
     description:
-      "ESS for payslips, leave, claims, and profile updates — web and mobile self-service for India and GCC employees.",
+      "Empower employees to access payslips, apply for leave, submit requests, and track approvals with OfficeKit ESS Portal.",
   },
   {
     path: "/features/exit-management",
-    title: "Exit Management & Offboarding | India & UAE — OfficeKit HR",
+    title: "Exit Management Module | OfficeKit HR",
     description:
-      "Resignations, clearance, F&F settlement, and UAE gratuity workflows. Structured offboarding for India and GCC teams.",
+      "Automate resignations, departmental clearances, asset recovery, and final settlements with OfficeKit Exit Management.",
   },
   {
     path: "/features/mobile-app",
-    title: "Mobile HRMS App | India & UAE — OfficeKit HR",
+    title: "Mobile HRMS Application | OfficeKit HR",
     description:
-      "iOS and Android HR app for attendance, leave, approvals, and payslips — built for India and GCC field and office teams.",
+      "Manage attendance, leave, approvals, and AI HR assistance anytime with the OfficeKit Mobile Application for iOS and Android.",
   },
   {
     path: "/features/employee-management",
-    title: "Employee Management System | India & GCC — OfficeKit HR",
+    title: "Employee Management Software | OfficeKit HR",
     description:
-      "Centralise employee records, documents, org charts, and lifecycle management for India and UAE companies in one HRMS.",
+      "Centralize employee records, documents, letter generation, and workforce data with OfficeKit Employee Management Software.",
   },
   {
     path: "/features/face-kit",
-    title: "Face Kit — AI Face Scan Attendance | India & UAE — OfficeKit HR",
+    title: "FaceKit — AI Face Recognition Attendance | OfficeKit HR",
     description:
-      "Touchless AI face scan attendance for India and GCC teams. Free up to 25 users, synced with OfficeKit HR payroll and shifts.",
+      "Mark secure, contactless attendance with AI face recognition and GPS verification using FaceKit by OfficeKit.",
   },
   {
     path: "/features/ai-pilot",
     title: "AI Pilot for HR Automation | India & GCC — OfficeKit HR",
     description:
       "Voice and chat AI HR assistant for leave, payslips, and policies. AI Pilot for India and GCC teams in OfficeKit HR.",
+  },
+  {
+    path: "/features/task-and-timesheet",
+    title: "Task & Timesheet Management Software | OfficeKit HR",
+    description:
+      "Track tasks, timesheets, productivity, and project costs with OfficeKit Task & Timesheet Management Software for India and Kerala businesses.",
+  },
+  {
+    path: "/features/claim-and-reimbursement",
+    title: "Claim & Reimbursement Software | OfficeKit HR",
+    description:
+      "Digitize expense claims, multi-level approvals, and reimbursements with OfficeKit Claim & Reimbursement Software.",
+  },
+  {
+    path: "/features/loans-and-advance",
+    title: "Loans & Advance Management Software | OfficeKit HR",
+    description:
+      "Manage employee loans, salary advances, EMI deductions, and payroll integration with OfficeKit Loans & Advance Management.",
+  },
+  {
+    path: "/features/document-management",
+    title: "Document Management Module | OfficeKit HR",
+    description:
+      "Upload, approve, store, and track employee documents with expiry alerts using OfficeKit Document Management Module.",
+  },
+  {
+    path: "/features/leave-management",
+    title: "Leave Management Module | OfficeKit HR",
+    description:
+      "Automate leave requests, approvals, balances, policies, and compensatory leave with OfficeKit Leave Management Module.",
   },
   {
     path: "/resources/blogs",

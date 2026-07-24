@@ -10,6 +10,7 @@ type FeaturePageLayoutProps = {
   productName: string;
   breadcrumbLabel: string;
   productDescription?: string;
+  faqs?: { question: string; answer: string }[];
   children: ReactNode;
 };
 
@@ -19,19 +20,21 @@ export function FeaturePageLayout({
   productName,
   breadcrumbLabel,
   productDescription,
+  faqs,
   children,
 }: FeaturePageLayoutProps) {
   const routeSeo = getRouteSeo(path);
   const geo = PAGE_GEO_BY_PATH[path];
   const description = productDescription ?? routeSeo.description;
   const url = canonicalUrl(path);
+  const schemaFaqs = faqs ?? geo?.faqs;
 
   return (
     <PageShell
       title={routeSeo.title}
       description={description}
       path={path}
-      faqs={geo?.faqs}
+      faqs={schemaFaqs}
       schemaNodes={[
         productSchema({ name: productName, description, url }),
         breadcrumbSchema([

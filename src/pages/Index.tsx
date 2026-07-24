@@ -9,13 +9,14 @@ import { LazyMotionBoundary } from "@/components/motion/LazyMotionBoundary";
 
 const WhyOfficeKit = lazy(() => import("@/components/WhyOfficeKit"));
 const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
+const IndustrySolutions = lazy(() => import("@/components/IndustrySolutions"));
 const FAQSection = lazy(() => import("@/components/FAQSection"));
 const TrustBadges = lazy(() =>
   import("@/components/TrustBadges").then((m) => ({ default: m.TrustBadges }))
 );
 const MobileApp = lazy(() => import("@/components/MobileApp"));
 const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection"));
-const ContactSection = lazy(() => import("@/components/ContactSection"));
+const FinalCtaSection = lazy(() => import("@/components/FinalCtaSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 
 const Index = () => {
@@ -42,6 +43,9 @@ const Index = () => {
             <FeaturesSection />
           </Suspense>
           <Suspense fallback={null}>
+            <IndustrySolutions />
+          </Suspense>
+          <Suspense fallback={null}>
             <FAQSection />
           </Suspense>
         </LazyMotionBoundary>
@@ -60,7 +64,7 @@ const Index = () => {
           </Suspense>
         </DeferredMount>
 
-        <DeferredMount minHeight="280px">
+        <DeferredMount minHeight="200px">
           <LazyMotionBoundary>
             <Suspense fallback={null}>
               <TestimonialsSection />
@@ -68,9 +72,9 @@ const Index = () => {
           </LazyMotionBoundary>
         </DeferredMount>
 
-        <DeferredMount minHeight="360px">
+        <DeferredMount minHeight="240px">
           <Suspense fallback={null}>
-            <ContactSection />
+            <FinalCtaSection />
           </Suspense>
         </DeferredMount>
       </main>

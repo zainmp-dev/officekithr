@@ -8,7 +8,15 @@ const ScrollToTop = () => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    try {
+      window.history.scrollRestoration = "manual";
+    } catch {
+      /* ignore */
+    }
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     trackPageView(pathname);
 
     // GA4 only counts scroll/time/active-user events once per listener lifetime.

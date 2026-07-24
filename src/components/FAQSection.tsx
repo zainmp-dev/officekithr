@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -40,17 +41,17 @@ function FaqAnswer({ faq }: { faq: HomeFaq }) {
 
 function FaqAccordion({ faqs, idPrefix }: { faqs: HomeFaq[]; idPrefix: string }) {
   return (
-    <Accordion type="single" collapsible className="space-y-3">
+    <Accordion type="single" collapsible className="w-full space-y-3">
       {faqs.map((faq, index) => (
         <AccordionItem
-          key={faq.question}
+          key={`${idPrefix}-${faq.question}`}
           value={`${idPrefix}-${index}`}
-          className="border border-border rounded-xl px-6 bg-background"
+          className="rounded-xl border border-border bg-background px-4 sm:px-6"
         >
-          <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5">
+          <AccordionTrigger className="py-4 text-left text-sm font-semibold text-foreground hover:no-underline sm:py-5 sm:text-base">
             {faq.question}
           </AccordionTrigger>
-          <AccordionContent className="home-faq-answer text-muted-foreground pb-5 leading-relaxed">
+          <AccordionContent className="home-faq-answer pb-5 text-sm leading-relaxed text-muted-foreground sm:text-base">
             <FaqAnswer faq={faq} />
           </AccordionContent>
         </AccordionItem>
@@ -67,39 +68,52 @@ type FAQSectionProps = {
 const FAQSection = ({ variant = "home", categories }: FAQSectionProps) => {
   const isPage = variant === "page";
   const faqCategories = categories ?? HOME_FAQ_CATEGORIES;
-  const defaultTab = faqCategories[0]?.id ?? "general";
+  const defaultTab = faqCategories[0]?.id ?? "overview";
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  useEffect(() => {
+    setActiveTab(defaultTab);
+  }, [defaultTab]);
+
+  if (!faqCategories.length) return null;
 
   return (
     <section
-      className="mb-16 sm:mb-24 lg:mb-mb-common bg-background"
+      className="mb-16 bg-background sm:mb-24 lg:mb-28"
       aria-labelledby={isPage ? undefined : "faq-heading"}
     >
       <div className="container mx-auto px-4">
         {!isPage && (
-          <div className="text-center mb-8 sm:mb-12">
-            <Badge className="bg-white mb-3 sm:mb-4 font-normal py-2 px-4 text-[#1d4ed8] border border-[#ededed] hover:bg-transparent">
+          <div className="mb-8 text-center sm:mb-12">
+            <Badge className="mb-3 border border-[#ededed] bg-white px-4 py-2 font-normal text-[#1d4ed8] hover:bg-transparent sm:mb-4">
               FAQs
             </Badge>
             <h2
               id="faq-heading"
-              className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-hr-text-primary mb-3"
+              className="mb-3 text-3xl font-semibold text-hr-text-primary sm:text-4xl lg:text-5xl"
             >
-              Frequently Asked <span className="leading-snug gradient-text">Questions</span>
+              Frequently Asked{" "}
+              <span className="gradient-text leading-snug">Questions</span>
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg lg:text-xl">
               Quick answers to common questions about OfficeKit HR
             </p>
           </div>
         )}
 
-        <div className={`max-w-4xl mx-auto ${isPage ? "pt-4 md:pt-8" : ""}`}>
-          <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="flex h-auto w-full flex-wrap justify-center gap-2 rounded-2xl border border-border/50 bg-muted/30 p-2 mb-8 shadow-none">
+        <div className={`mx-auto max-w-4xl ${isPage ? "pt-4 md:pt-8" : ""}`}>
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="mb-8 flex h-auto w-full flex-wrap justify-center gap-2 rounded-2xl border border-border/50 bg-muted/40 p-2 shadow-none">
               {faqCategories.map((category) => (
                 <TabsTrigger
                   key={category.id}
                   value={category.id}
-                  className="rounded-full border border-transparent px-3.5 py-2 text-xs sm:text-sm font-medium text-muted-foreground shadow-none transition-all duration-200 hover:text-foreground data-[state=active]:border-[#0055ff] data-[state=active]:bg-[#0055ff] data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:shadow-[#0055ff]/20 focus-visible:ring-[#0055ff]/30"
+                  type="button"
+                  className="rounded-full border border-transparent px-3.5 py-2 text-xs font-medium text-muted-foreground shadow-none transition-all duration-200 hover:bg-white hover:text-foreground data-[state=active]:border-[#0055ff] data-[state=active]:bg-[#0055ff] data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:shadow-[#0055ff]/20 focus-visible:ring-[#0055ff]/30 sm:text-sm"
                 >
                   {category.label}
                 </TabsTrigger>
@@ -107,26 +121,31 @@ const FAQSection = ({ variant = "home", categories }: FAQSectionProps) => {
             </TabsList>
 
             {faqCategories.map((category) => (
-              <TabsContent key={category.id} value={category.id} className="mt-0">
+              <TabsContent
+                key={category.id}
+                value={category.id}
+                className="mt-0 focus-visible:outline-none"
+              >
                 <FaqAccordion faqs={category.faqs} idPrefix={category.id} />
               </TabsContent>
             ))}
           </Tabs>
 
           {!isPage && (
-            <div className="mt-10 rounded-2xl border border-border/60 bg-gradient-to-br from-muted/40 via-background to-blue-50/40 p-6 sm:p-8 text-center">
+            <div className="mt-10 rounded-2xl border border-border/60 bg-gradient-to-br from-muted/40 via-background to-blue-50/40 p-6 text-center sm:p-8">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0055ff]/10 text-[#0055ff]">
                 <CircleHelp className="h-6 w-6" aria-hidden />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-foreground sm:text-xl">
                 Need more detail?
               </h3>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto mb-6">
-                Browse all {FAQ_PAGE_ALL_FAQS.length} answers on India &amp; GCC payroll, WPS, modules, implementation, and security.
+              <p className="mx-auto mb-6 max-w-md text-sm text-muted-foreground sm:text-base">
+                Browse all {FAQ_PAGE_ALL_FAQS.length} answers on India &amp; GCC
+                payroll, WPS, modules, implementation, and security.
               </p>
               <Button
                 asChild
-                className="rounded-full bg-[#0055ff] hover:bg-[#0044cc] h-11 px-6 group"
+                className="group h-11 rounded-full bg-[#0055ff] px-6 hover:bg-[#0044cc]"
               >
                 <Link to="/faq">
                   View all FAQs

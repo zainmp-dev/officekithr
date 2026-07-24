@@ -1,6 +1,7 @@
 import React from "react";
 import { TestimonialMarquee } from "@/components/motion/TestimonialMarquee";
 import { PartnerLogo } from "@/components/ui/PartnerLogo";
+import { HOME_TRUSTED } from "@/data/home-page-content";
 
 const LOGOS = [
   "/company-logos/abreco.webp",
@@ -12,6 +13,7 @@ const LOGOS = [
   "/company-logos/chavara.webp",
   "/company-logos/clikon.webp",
   "/company-logos/clubsulaimani.webp",
+  "/company-logos/crowe.webp",
   "/company-logos/empire.webp",
   "/company-logos/kvn.webp",
   "/company-logos/landmark.webp",
@@ -53,7 +55,7 @@ type LogoItemProps = {
 };
 
 const LogoItem = ({ src, label, priority = false }: LogoItemProps) => (
-  <div className="flex h-16 w-[8.5rem] shrink-0 items-center justify-center sm:h-[4.5rem] sm:w-40 md:h-20 md:w-44">
+  <div className="flex h-14 w-full shrink-0 items-center justify-center sm:h-16 sm:w-[8.5rem] md:h-[4.5rem] md:w-40 lg:h-20 lg:w-44">
     <PartnerLogo
       src={src}
       label={label}
@@ -100,34 +102,68 @@ const TrustedCompaniesShowcase = () => {
     >
       <div className="container mx-auto px-6 lg:px-8">
         <div className="mb-8 text-center lg:mb-10">
+          <p className="mb-2 text-sm font-medium text-[#1d4ed8] sm:text-base">
+            {HOME_TRUSTED.heading}
+          </p>
           <h2
             id="trusted-companies-heading"
             className="text-lg font-semibold text-foreground sm:text-xl lg:text-2xl"
           >
-            Trusted by leading companies across the globe
+            {HOME_TRUSTED.logoHeading}
           </h2>
+          <p className="mx-auto mt-3 max-w-3xl text-sm text-muted-foreground sm:text-base">
+            {HOME_TRUSTED.logoSubheading}
+          </p>
+
+          <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+            {HOME_TRUSTED.stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl border border-border/60 bg-muted/30 px-4 py-5"
+              >
+                <p className="text-2xl font-semibold text-foreground sm:text-3xl">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="relative">
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background via-background/80 to-transparent sm:w-16 md:w-24"
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-10 bg-gradient-to-r from-background via-background/80 to-transparent sm:block sm:w-16 md:w-24"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background via-background/80 to-transparent sm:w-16 md:w-24"
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-10 bg-gradient-to-l from-background via-background/80 to-transparent sm:block sm:w-16 md:w-24"
           aria-hidden
         />
 
-        {ROWS.map((logos, i) => (
-          <LogoRow
-            key={i}
-            logos={logos}
-            rowIndex={i}
-            duration={ROW_CONFIG[i].duration}
-            reverse={ROW_CONFIG[i].reverse}
-          />
-        ))}
+        {/* Compact logo grid on small screens — avoids 3 wrapped marquee rows */}
+        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-3 px-4 sm:hidden">
+          {LOGOS.slice(0, 9).map((src, i) => (
+            <LogoItem
+              key={`m-${src}`}
+              src={src}
+              label={`Partner logo ${i + 1}`}
+              priority={i < 3}
+            />
+          ))}
+        </div>
+
+        <div className="hidden sm:block">
+          {ROWS.map((logos, i) => (
+            <LogoRow
+              key={i}
+              logos={logos}
+              rowIndex={i}
+              duration={ROW_CONFIG[i].duration}
+              reverse={ROW_CONFIG[i].reverse}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
