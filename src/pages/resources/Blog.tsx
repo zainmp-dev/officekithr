@@ -372,11 +372,11 @@ const Blog = () => {
               >
                 <Card className="overflow-hidden border-border shadow-strong transition-shadow group-hover:shadow-lg">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                    <div className="relative aspect-[16/10] overflow-hidden bg-muted/40 lg:aspect-auto lg:min-h-[280px]">
+                    <div className="relative flex items-center justify-center overflow-hidden bg-muted/40 lg:min-h-[280px]">
                       <img
                         src={featuredPost.image}
                         alt={featuredPost.title}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                        className="block h-auto w-full object-contain"
                         loading="eager"
                         decoding="async"
                         onError={(e) => {
@@ -460,7 +460,7 @@ const Blog = () => {
                     key={i}
                     className="overflow-hidden rounded-xl border border-border bg-card"
                   >
-                    <div className="aspect-[16/10] animate-pulse bg-muted" />
+                    <div className="aspect-[16/9] animate-pulse bg-muted" />
                     <div className="space-y-3 p-5">
                       <div className="h-3 w-24 animate-pulse rounded bg-muted" />
                       <div className="h-5 w-full animate-pulse rounded bg-muted" />
@@ -482,11 +482,11 @@ const Blog = () => {
                       onFocus={() => handlePostHover(post)}
                     >
                       <Card className="overflow-hidden border-border shadow-medium h-full flex flex-col transition-shadow group-hover:shadow-lg">
-                        <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-muted/40">
+                        <div className="relative flex shrink-0 items-center justify-center overflow-hidden bg-muted/40">
                           <img
                             src={post.image}
                             alt={post.title}
-                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                            className="block h-auto w-full object-contain"
                             loading="lazy"
                             decoding="async"
                             onError={(e) => {

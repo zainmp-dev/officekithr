@@ -14,6 +14,10 @@ export const HERO_BANNER_HOLD = 0.12;
 /** Text starts after the banner hold. */
 export const HERO_TEXT_DELAY = HERO_BANNER_HOLD;
 
+/** Horizontal travel (vw) — text from the left, tablet from the right. */
+export const HERO_TEXT_ENTER_X = 48;
+export const HERO_TABLET_ENTER_X = 56;
+
 /** Tablet follows the text slightly so the entrance reads left → right. */
 export const HERO_TABLET_DELAY = HERO_BANNER_HOLD + 0.1;
 

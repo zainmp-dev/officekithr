@@ -13,6 +13,7 @@ import {
   HERO_INTRO_EASE,
   HERO_INTRO_TOTAL_MS,
   HERO_TABLET_DELAY,
+  HERO_TABLET_ENTER_X,
 } from "@/components/motion/hero-intro";
 
 /**
@@ -30,7 +31,7 @@ const T = {
  */
 
 /** Horizontal travel in vw — open stage, no clip box. */
-const TABLET_ENTER_X = 56;
+const TABLET_ENTER_X = HERO_TABLET_ENTER_X;
 const TABLET_REST_X = 0;
 const TABLET_EXIT_X = 72;
 const PHONE_ENTER_X = 70;

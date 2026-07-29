@@ -27,7 +27,7 @@ export function HeroCopy({ className }: HeroCopyProps) {
   return (
     <div
       className={cn(
-        "relative z-20 flex w-full max-w-xl flex-col items-start text-left lg:max-w-[38rem]",
+        "relative z-20 flex w-full max-w-xl flex-col items-start text-left lg:max-w-[38rem] lg:pl-8 xl:pl-12 2xl:pl-16",
         className
       )}
     >
