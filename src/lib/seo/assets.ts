@@ -43,10 +43,10 @@ export const HERO_IMAGES = {
   /** Hero load-in tablet — 3D mockup with transparent background (angle baked in). */
   tablet: {
     src: "/hero-tablet-mockup.png",
-    srcSet: "/hero-tablet-mockup.png 1024w",
+    srcSet: "/hero-tablet-mockup.png 512w",
     sizes: "(min-width: 1280px) 720px, (min-width: 1024px) 560px, 90vw",
-    width: 1024,
-    height: 784,
+    width: 512,
+    height: 393,
     alt: "OfficeKit HR dashboard overview on tablet",
   },
   desktop: {
