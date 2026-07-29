@@ -33,8 +33,8 @@ export const HERO_IMAGES = {
   },
   /** Hero scroll-swap phone — premium 3D mockup (angle baked into asset). */
   phone: {
-    src: "/hero-phone-mockup.png",
-    srcSet: "/hero-phone-mockup.png 622w",
+    src: "/hero-phone-mockup.webp",
+    srcSet: "/hero-phone-mockup.webp 622w",
     sizes: "(min-width: 1280px) 360px, (min-width: 1024px) 320px, 280px",
     width: 622,
     height: 912,
@@ -42,8 +42,9 @@ export const HERO_IMAGES = {
   },
   /** Hero load-in tablet — 3D mockup with transparent background (angle baked in). */
   tablet: {
-    src: "/hero-tablet-mockup.png",
-    srcSet: "/hero-tablet-mockup.png 512w",
+    src: "/hero-tablet-mockup.webp",
+    srcSet:
+      "/hero-tablet-mockup.webp 512w, /hero-tablet-mockup-1024.webp 1024w",
     sizes: "(min-width: 1280px) 720px, (min-width: 1024px) 560px, 90vw",
     width: 512,
     height: 393,
