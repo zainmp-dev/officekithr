@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState } from "react";
 import {
   animate,
   m,
@@ -12,19 +12,24 @@ import {
   HERO_INTRO_DURATION,
   HERO_INTRO_EASE,
   HERO_INTRO_TOTAL_MS,
+  HERO_PHONE_HOLD_MS,
+  HERO_SWAP_DURATION_S,
+  HERO_SWAP_EASE,
   HERO_TABLET_DELAY,
   HERO_TABLET_ENTER_X,
+  HERO_TABLET_HOLD_MS,
 } from "@/components/motion/hero-intro";
 
 /**
- * Scroll timeline (0 → 1 while pinned):
- * Most of the pin drives the swap; only a short settle after the phone lands
- * so scrolling does not feel stuck.
+ * Device-swap timeline (progress 0 → 1, eased once at the driver level).
+ * Position and opacity ranges overlap so both devices coexist during the handoff.
  */
 const T = {
-  tabletGone: 0.42,
-  phoneArrive: 0.78,
-} as const;
+  tabletMove: [0, 0.68] as const,
+  phoneMove: [0.08, 0.92] as const,
+  tabletFade: [0, 0.72] as const,
+  phoneFade: [0.12, 0.88] as const,
+};
 
 /**
  * Device mockups include their own 3D angle — no extra CSS perspective.
@@ -37,34 +42,21 @@ const TABLET_EXIT_X = 72;
 const PHONE_ENTER_X = 70;
 const PHONE_REST_X = 0;
 
-function easeInOutCubic(t: number) {
-  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-}
-
-function segmentT(progress: number, start: number, end: number) {
+function segment(progress: number, start: number, end: number) {
   if (progress <= start) return 0;
   if (progress >= end) return 1;
-  return easeInOutCubic((progress - start) / (end - start));
+  return (progress - start) / (end - start);
 }
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
-function forceScrollTop() {
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-}
-
 /**
- * Pin + scrub only after the load intro finishes, so a restored scroll
- * position cannot show a half tablet / phone on first paint.
+ * Auto-loop device swap after the load intro finishes.
+ * Reuses the same progress-driven transforms as the former scroll scrub.
  */
-function usePinnedProgress(
-  sectionRef: RefObject<HTMLElement | null>,
-  introReady: boolean
-) {
+function useAutoLoopProgress(introReady: boolean) {
   const progress = useMotionValue(0);
 
   useEffect(() => {
@@ -73,60 +65,54 @@ function usePinnedProgress(
       return;
     }
 
-    const section = sectionRef.current;
-    if (!section) return;
-
     let cancelled = false;
-    let revert: (() => void) | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let activeControl: { stop: () => void } | undefined;
 
-    void (async () => {
-      const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      if (cancelled) return;
-
-      gsap.registerPlugin(ScrollTrigger);
-      forceScrollTop();
-      progress.set(0);
-
-      const html = document.documentElement;
-      const prevScrollBehavior = html.style.scrollBehavior;
-      html.style.scrollBehavior = "auto";
-
-      const trigger = ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: "+=130%",
-        pin: true,
-        scrub: 0.35,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          progress.set(self.progress);
-        },
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        timeoutId = window.setTimeout(() => {
+          timeoutId = undefined;
+          resolve();
+        }, ms);
       });
 
-      const onLoad = () => {
-        forceScrollTop();
-        ScrollTrigger.refresh();
-        progress.set(0);
-      };
-      window.addEventListener("load", onLoad);
-      ScrollTrigger.refresh();
+    const tween = (to: number) => {
+      const control = animate(progress, to, {
+        duration: HERO_SWAP_DURATION_S,
+        ease: HERO_SWAP_EASE,
+      });
+      activeControl = control;
+      return control;
+    };
+
+    const runLoop = async () => {
       progress.set(0);
 
-      revert = () => {
-        window.removeEventListener("load", onLoad);
-        html.style.scrollBehavior = prevScrollBehavior;
-        trigger.kill();
-        progress.set(0);
-      };
-    })();
+      while (!cancelled) {
+        await wait(HERO_TABLET_HOLD_MS);
+        if (cancelled) break;
+
+        await tween(1);
+        if (cancelled) break;
+
+        await wait(HERO_PHONE_HOLD_MS);
+        if (cancelled) break;
+
+        await tween(0);
+        if (cancelled) break;
+      }
+    };
+
+    void runLoop();
 
     return () => {
       cancelled = true;
-      revert?.();
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      activeControl?.stop();
+      progress.set(0);
     };
-  }, [sectionRef, progress, introReady]);
+  }, [introReady, progress]);
 
   return progress;
 }
@@ -136,16 +122,10 @@ function useIntroProgress() {
   const [introReady, setIntroReady] = useState(false);
 
   useEffect(() => {
-    forceScrollTop();
-    // Warm GSAP while the intro plays so pin setup does not hitch afterward.
-    void import("gsap");
-    void import("gsap/ScrollTrigger");
-
     let completed = false;
     const finish = () => {
       if (completed) return;
       completed = true;
-      forceScrollTop();
       setIntroReady(true);
     };
 
@@ -174,41 +154,38 @@ function useDeviceTransforms(
   const tabletX = useTransform([intro, progress], ([i, p]) => {
     const settled = lerp(TABLET_ENTER_X, TABLET_REST_X, i as number);
     if ((p as number) <= 0) return `${settled}vw`;
-    const swap = segmentT(p as number, 0, T.tabletGone);
+    const swap = segment(p as number, T.tabletMove[0], T.tabletMove[1]);
     return `${lerp(TABLET_REST_X, TABLET_EXIT_X, swap)}vw`;
   });
 
   const phoneX = useTransform(progress, (p) => {
     if (p <= 0) return `${PHONE_ENTER_X}vw`;
-    const swap = segmentT(p, 0, T.phoneArrive);
+    const swap = segment(p, T.phoneMove[0], T.phoneMove[1]);
     return `${lerp(PHONE_ENTER_X, PHONE_REST_X, swap)}vw`;
   });
 
   const tabletOpacity = useTransform([intro, progress], ([i, p]) => {
     const introFade = i as number;
     if ((p as number) <= 0) return introFade;
-    return introFade * (1 - segmentT(p as number, 0, T.tabletGone));
+    const fade = segment(p as number, T.tabletFade[0], T.tabletFade[1]);
+    return introFade * (1 - fade);
   });
 
   const phoneOpacity = useTransform(progress, (p) => {
     if (p <= 0) return 0;
-    return segmentT(p, 0, T.phoneArrive);
+    return segment(p, T.phoneFade[0], T.phoneFade[1]);
   });
 
   return { tabletX, phoneX, tabletOpacity, phoneOpacity };
 }
 
-type HeroDeviceMorphProps = {
-  sectionRef: RefObject<HTMLElement | null>;
-};
-
 /**
- * Load: text left + full tablet from the right (scroll locked at top).
- * After intro: scroll-scrubbed tablet → phone replacement.
+ * Load: text left + full tablet from the right.
+ * After intro: auto-looping tablet ↔ phone swap on a timer.
  */
-export function HeroDeviceMorph({ sectionRef }: HeroDeviceMorphProps) {
+export function HeroDeviceMorph() {
   const { intro, introReady } = useIntroProgress();
-  const progress = usePinnedProgress(sectionRef, introReady);
+  const progress = useAutoLoopProgress(introReady);
   const { tabletX, phoneX, tabletOpacity, phoneOpacity } = useDeviceTransforms(
     progress,
     intro

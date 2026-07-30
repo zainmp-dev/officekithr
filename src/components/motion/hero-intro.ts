@@ -28,3 +28,18 @@ export const HERO_INTRO_DURATION = 1.15;
 export const HERO_INTRO_TOTAL_MS = Math.round(
   (HERO_TABLET_DELAY + HERO_INTRO_DURATION) * 1000
 );
+
+/** Pause on tablet before the auto device swap (ms). */
+export const HERO_TABLET_HOLD_MS = 1000;
+
+/** Pause on phone before reversing back to tablet (ms). */
+export const HERO_PHONE_HOLD_MS = 1000;
+
+/**
+ * Wall-clock duration for progress 0 → 1 (tablet → phone).
+ * Progress uses HERO_SWAP_EASE; transforms interpolate linearly on that curve.
+ */
+export const HERO_SWAP_DURATION_S = 0.9;
+
+/** Premium ease for the device handoff — gentle accel / decel (Apple / Linear style). */
+export const HERO_SWAP_EASE: [number, number, number, number] = [0.42, 0, 0.58, 1];

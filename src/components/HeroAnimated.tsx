@@ -1,4 +1,3 @@
-import type { RefObject } from "react";
 import { HeroCopy } from "@/components/HeroCopy";
 import { HeroDeviceMorph } from "@/components/motion/HeroDeviceMorph";
 import { MotionProvider, m } from "@/lib/performance/motion";
@@ -9,15 +8,11 @@ import {
   HERO_TEXT_ENTER_X,
 } from "@/components/motion/hero-intro";
 
-type HeroAnimatedProps = {
-  sectionRef: RefObject<HTMLElement | null>;
-};
-
 /**
  * Desktop motion hero: after the banner paints, copy eases in from the left
  * while the tablet enters from the right.
  */
-export default function HeroAnimated({ sectionRef }: HeroAnimatedProps) {
+export default function HeroAnimated() {
   return (
     <MotionProvider>
       <div className="mx-auto grid w-full max-w-[90rem] flex-1 items-center gap-8 overflow-x-clip lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.25fr)] lg:gap-8 lg:overflow-visible xl:gap-10">
@@ -35,7 +30,7 @@ export default function HeroAnimated({ sectionRef }: HeroAnimatedProps) {
         </m.div>
 
         <div className="relative z-10 min-w-0 overflow-visible px-2 sm:px-4 lg:px-6 xl:px-8">
-          <HeroDeviceMorph sectionRef={sectionRef} />
+          <HeroDeviceMorph />
         </div>
       </div>
     </MotionProvider>
