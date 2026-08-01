@@ -13,6 +13,7 @@ import {
   ScanFace,
   Smartphone,
   UserCheck,
+  UserSearch,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,6 +36,15 @@ export const FEATURE_NAV_LINKS: FeatureNavLink[] = [
     icon: IdCard,
     description: "All employee data, unified.",
     descriptionAr: "جميع بيانات الموظفين، موحدة.",
+  },
+  {
+    id: "recruitment-management",
+    name: "Recruitment Management",
+    nameAr: "إدارة التوظيف",
+    href: "/features/recruitment-management",
+    icon: UserSearch,
+    description: "Manage jobs, candidates, and hiring.",
+    descriptionAr: "إدارة الوظائف والمرشحين والتوظيف.",
   },
   {
     id: "employee-self-service",
