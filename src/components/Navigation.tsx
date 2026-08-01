@@ -250,9 +250,9 @@ const Navigation = () => {
               <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${industriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
             {industriesOpen ? (
-              <div className="pointer-events-auto absolute top-[calc(100%+14px)] right-[-630px] z-[70] w-[86vw] max-w-[min(780px,calc(100vw-96px))]">
+              <div className="pointer-events-auto absolute left-1/2 top-[calc(100%+14px)] z-[70] w-[min(86vw,780px)] max-w-[calc(100vw-2rem)] -translate-x-1/2">
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-3 md:p-4">
-                  <div className="grid grid-cols-3 gap-y-2.5 md:gap-y-3 gap-x-0.5 md:gap-x-1">
+                  <div className="grid grid-cols-2 gap-y-2.5 md:grid-cols-3 md:gap-y-3 gap-x-0.5 md:gap-x-1">
                     {INDUSTRY_NAV_LINKS.map((link) => (
                       <Link
                         key={link.href}

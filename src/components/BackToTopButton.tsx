@@ -61,7 +61,7 @@ export function BackToTopButton() {
       tabIndex={-1}
       aria-label="Scroll to top"
       onClick={scrollToTop}
-      className="fixed bottom-6 left-6 z-[9990] flex h-11 w-11 items-center justify-center rounded-full border border-primary/20 bg-background/95 text-primary shadow-lg backdrop-blur-sm transition-[opacity,transform] duration-300 ease-out opacity-0 pointer-events-none translate-y-2 data-[visible=true]:opacity-100 data-[visible=true]:pointer-events-auto data-[visible=true]:translate-y-0 hover:bg-primary hover:text-primary-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-sm:bottom-5 max-sm:left-5"
+      className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] left-5 z-[9990] flex h-11 w-11 items-center justify-center rounded-full border border-primary/20 bg-background/95 text-primary shadow-lg backdrop-blur-sm transition-[opacity,transform] duration-300 ease-out opacity-0 pointer-events-none translate-y-2 data-[visible=true]:opacity-100 data-[visible=true]:pointer-events-auto data-[visible=true]:translate-y-0 hover:bg-primary hover:text-primary-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 lg:bottom-6 lg:left-6"
     >
       <ChevronUp className="h-5 w-5" strokeWidth={2.25} aria-hidden />
     </button>

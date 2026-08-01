@@ -19,7 +19,7 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     companyLogo: "/company-logos/lulu.webp",
     rating: 5,
     quote:
-      "OfficeKit HR is an easy-to-use employee management software, fully customizable HRMS which made our tedious tasks of daily HR process so easy.",
+      "OfficeKit transformed our payroll and attendance management process. The platform is easy to use and has significantly reduced manual work.",
   },
   {
     name: "Anees",
@@ -28,15 +28,7 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     companyLogo: "/company-logos/thai.webp",
     rating: 5,
     quote:
-      "OfficeKit HR lets you put your thoughts together in a very concise format through the best HR software and it really helps you present your best phase.",
-  },
-  {
-    name: "Venugopal",
-    role: "Chief Executive Officer",
-    company: "Buchprufer",
-    rating: 5,
-    quote:
-      "We have been using OfficeKit HR for the last couple of years, and it has helped us through the growth and management of our company.",
+      "The recruitment and employee management features helped us streamline HR operations across multiple branches.",
   },
   {
     name: "Sajitha",
@@ -45,7 +37,7 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     companyLogo: "/company-logos/midac.webp",
     rating: 5,
     quote:
-      "Statutory payroll for India and WPS for UAE on one platform saved our HR team weeks every month.",
+      "The mobile app and employee self-service portal improved employee engagement and reduced HR dependency.",
   },
 ] as const;
 

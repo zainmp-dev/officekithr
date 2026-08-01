@@ -23,13 +23,32 @@ export const NAV_LOGO_SIZES = "(max-width: 767px) 108px, (max-width: 1023px) 108
 
 export const HERO_IMAGES = {
   mobile: {
-    src: "/mobile-mockup-240.webp",
+    src: "/mobile-app-phone.webp",
     srcSet:
-      "/mobile-mockup-240.webp 240w, /mobile-mockup-320.webp 320w, /mobile-mockup-480.webp 480w, /mobile-mockup-768.webp 768w",
-    sizes: "(max-width: 480px) 240px, (max-width: 768px) 252px, 320px",
-    width: 240,
-    height: 480,
-    alt: "OfficeKit HR mobile app overview",
+      "/mobile-app-phone-240.webp 240w, /mobile-app-phone-320.webp 320w, /mobile-app-phone-480.webp 480w, /mobile-app-phone-768.webp 768w",
+    sizes: "(max-width: 640px) 260px, (max-width: 1023px) 300px, 340px",
+    width: 471,
+    height: 912,
+    alt: "OfficeKit HR mobile app — attendance, quick actions, and employee self-service",
+  },
+  /** Hero scroll-swap phone — premium 3D mockup (angle baked into asset). */
+  phone: {
+    src: "/hero-phone-mockup.webp",
+    srcSet: "/hero-phone-mockup.webp 622w",
+    sizes: "(min-width: 1280px) 360px, (min-width: 1024px) 320px, 280px",
+    width: 622,
+    height: 912,
+    alt: "OfficeKit HR mobile app on smartphone",
+  },
+  /** Hero load-in tablet — 3D mockup with transparent background (angle baked in). */
+  tablet: {
+    src: "/hero-tablet-mockup.webp",
+    srcSet:
+      "/hero-tablet-mockup.webp 512w, /hero-tablet-mockup-1024.webp 1024w",
+    sizes: "(min-width: 1280px) 720px, (min-width: 1024px) 560px, 90vw",
+    width: 512,
+    height: 393,
+    alt: "OfficeKit HR dashboard overview on tablet",
   },
   desktop: {
     src: "/dashboardok-768.webp",

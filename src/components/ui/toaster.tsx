@@ -35,7 +35,7 @@ export function Toaster() {
             key={id}
             {...props}
             className={cn(
-              "rounded-lg shadow-xl border-2 text-white min-w-[320px] max-w-md",
+              "rounded-lg shadow-xl border-2 text-white w-[min(100%,24rem)] min-w-0 max-w-[calc(100vw-2rem)]",
               variant === "success" && "bg-green-500 border-green-400",
               variant === "destructive" && "bg-red-500 border-red-400",
               !variant && "bg-slate-800 border-slate-700"

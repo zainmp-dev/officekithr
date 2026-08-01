@@ -43,6 +43,11 @@ const SelfServicePortal = lazy(() => import("./pages/features/SelfServicePortal"
 const ExitManagement = lazy(() => import("./pages/features/ExitManagement"));
 const MobileApp = lazy(() => import("./pages/features/MobileApp"));
 const Employeemanagment = lazy(() => import("./pages/features/EmployementManagment"));
+const TaskAndTimesheet = lazy(() => import("./pages/features/TaskAndTimesheet"));
+const ClaimAndReimbursement = lazy(() => import("./pages/features/ClaimAndReimbursement"));
+const LoansAndAdvance = lazy(() => import("./pages/features/LoansAndAdvance"));
+const DocumentManagement = lazy(() => import("./pages/features/DocumentManagement"));
+const LeaveManagement = lazy(() => import("./pages/features/LeaveManagement"));
 const OkaiLens = lazy(() => import("./pages/face-lens"));
 const Chatbot = lazy(() => import("./pages/AiPilot"));
 const Blog = lazy(() => import("./pages/resources/Blog"));
@@ -178,6 +183,26 @@ const AppRoutes = () => {
           <Route
             path="/features/employee-management"
             element={<Employeemanagment />}
+          />
+          <Route
+            path="/features/task-and-timesheet"
+            element={<TaskAndTimesheet />}
+          />
+          <Route
+            path="/features/claim-and-reimbursement"
+            element={<ClaimAndReimbursement />}
+          />
+          <Route
+            path="/features/loans-and-advance"
+            element={<LoansAndAdvance />}
+          />
+          <Route
+            path="/features/document-management"
+            element={<DocumentManagement />}
+          />
+          <Route
+            path="/features/leave-management"
+            element={<LeaveManagement />}
           />
           <Route
             path="/features/employe-managment"

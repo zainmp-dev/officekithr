@@ -12,26 +12,62 @@ export type HomeFaqCategory = {
   faqs: HomeFaq[];
 };
 
-/** Lean homepage FAQs — high-intent questions only; full list lives on /faq. */
+/** Lean homepage FAQs — high-intent questions by topic; full list lives on /faq. */
 export const HOME_FAQ_CATEGORIES: HomeFaqCategory[] = [
   {
     id: "overview",
     label: "Overview",
     faqs: [
       {
-        question: "What is OfficeKit HR?",
+        question: "What is HRMS software?",
         answer:
-          "OfficeKit HR is an AI-powered HRMS for growing businesses in India and the GCC. It unifies recruitment, onboarding, attendance, leave, payroll, performance, and employee self-service on one platform — replacing spreadsheets and disconnected tools from hire to retire.",
+          "HRMS software is a digital solution that helps organizations manage employee information, payroll, attendance, leave, recruitment, performance, and other HR processes from a centralized platform.",
       },
       {
-        question: "Who is OfficeKit HR built for?",
+        question: "Is OfficeKit suitable for small businesses?",
         answer:
-          "Startups, SMEs, and mid-market companies with 50–2,000+ employees — especially teams running multi-branch or multi-country operations across India, UAE, Saudi Arabia, Kuwait, Qatar, and other GCC markets.",
+          "Yes. OfficeKit is designed for startups, SMEs, and large enterprises looking for scalable HR management solutions.",
       },
       {
-        question: "Is OfficeKit HR suitable for multi-location businesses?",
+        question: "Does OfficeKit include payroll management?",
         answer:
-          "Yes. Run location-specific leave rules, shifts, holiday calendars, and payroll policies per branch or country — while HR leadership sees consolidated headcount, cost, and compliance reports from one dashboard.",
+          "Yes. OfficeKit offers automated payroll processing, salary calculations, compliance management, and payroll reporting.",
+      },
+      {
+        question: "Can employees access OfficeKit from mobile devices?",
+        answer:
+          "Yes. OfficeKit offers mobile applications for both employees and managers.",
+      },
+    ],
+  },
+  {
+    id: "india-gcc",
+    label: "India & GCC",
+    faqs: [
+      {
+        question: "Which countries does OfficeKit HR support?",
+        answer:
+          "OfficeKit supports India, UAE, Saudi Arabia, Kuwait, Qatar, Oman, and Bahrain — with localized payroll, statutory compliance, and employee self-service for each market.",
+      },
+      {
+        question: "Does OfficeKit HR support UAE payroll and WPS compliance?",
+        answer:
+          "Yes. OfficeKit generates WPS-compliant SIF bank files for UAE salary transfers, handles gratuity and end-of-service calculations, and includes WPS workflows in payroll — not as a paid add-on.",
+      },
+      {
+        question: "Can one HRMS run payroll in both India and the GCC?",
+        answer:
+          "Yes. Companies with India headquarters and Gulf subsidiaries use OfficeKit to run PF/ESI/TDS payroll for Indian entities and WPS/GOSI payroll for GCC entities on one platform, with shared employee records and group-level reporting.",
+      },
+      {
+        question: "What Indian statutory compliance does OfficeKit automate?",
+        answer: "Indian payroll covers:",
+        bullets: [
+          "Provident Fund (PF) and Employee State Insurance (ESI) deductions and filings.",
+          "Professional Tax (PT) across applicable states.",
+          "Income tax (TDS) and Form 16 generation.",
+          "Gratuity provisions and audit-ready statutory reports.",
+        ],
       },
     ],
   },
@@ -40,45 +76,164 @@ export const HOME_FAQ_CATEGORIES: HomeFaqCategory[] = [
     label: "Payroll",
     faqs: [
       {
-        question: "Does OfficeKit HR support UAE WPS and GCC payroll?",
+        question: "Does payroll sync with attendance and leave automatically?",
         answer:
-          "Yes. OfficeKit generates WPS-compliant salary files (SIF) for the UAE, Saudi Arabia, and other GCC countries, with localized payroll workflows built in — no separate WPS add-on required.",
+          "Yes. Pay runs pull approved leave, overtime, and attendance data directly from the HRMS — reducing manual exports and reconciliation every month.",
       },
       {
-        question: "Can one HRMS handle India and GCC payroll together?",
+        question: "Can OfficeKit handle multi-company or holding-group payroll?",
         answer:
-          "Yes. OfficeKit runs India statutory payroll (PF, ESI, PT, TDS) and GCC payroll (WPS, GOSI, and local schemes) on one platform — ideal for companies with India HQ and Gulf subsidiaries.",
+          "Yes. Gold and Platinum plans support multi-company structures — run separate payroll entities, policies, and reports while sharing a unified HR database.",
       },
       {
-        question: "How does statutory compliance work for India?",
+        question: "Can employees download payslips and tax documents?",
         answer:
-          "Indian payroll covers PF, ESI, Professional Tax, and TDS with audit-ready reports. Calculations pull from attendance and leave data so month-end runs need less manual reconciliation.",
+          "Yes. Employees access digital payslips, Form 16 (India), and salary certificates through self-service on web and mobile — anytime, without HR intervention.",
+      },
+      {
+        question: "Does OfficeKit support reimbursements and salary advances?",
+        answer:
+          "Yes. Gold and Platinum plans include claims, reimbursements, and salary advance workflows with manager approvals — integrated into monthly payroll runs.",
       },
     ],
   },
   {
-    id: "getting-started",
-    label: "Get started",
+    id: "attendance",
+    label: "Attendance",
     faqs: [
       {
-        question: "How much does OfficeKit HR cost?",
-        answer:
-          "OfficeKit HR offers modular Silver, Gold, and Platinum plans priced per active user per month. Silver covers core HR; Gold adds multi-company, performance, and claims; Platinum includes travel, training, and grievance modules. See our pricing page or book a demo for a tailored quote.",
+        question: "How does OfficeKit HR track employee attendance?",
+        answer: "Multiple capture methods work side by side:",
+        ordered: true,
+        bullets: [
+          "Biometric devices — real-time sync from eSSL and compatible hardware across branches.",
+          "Geo-fencing and geo-tagging — mobile check-in for field and remote teams within defined boundaries.",
+          "Face Kit — facial recognition for touchless attendance.",
+          "Web check-in — clock in/out through the employee self-service portal.",
+        ],
       },
       {
-        question: "How long does it take to go live?",
+        question: "Are shift and overtime rules configurable?",
         answer:
-          "Most teams go live in 2–6 weeks depending on employee count, data migration scope, and policy complexity. Our implementation team handles setup, migration, and training so your HR team is not left to figure it out alone.",
+          "Yes. Define rotating shifts, night shifts, grace periods, break rules, and overtime policies by department or location. Overtime hours auto-calculate from attendance logs against assigned shifts.",
       },
       {
-        question: "How do we get started?",
+        question: "Can we configure custom leave policies?",
         answer:
-          "Book a free demo on our website. Our implementation team helps with data migration, policy setup, and training. Ongoing support is available via email, chat, and phone.",
+          "Yes. Set up leave types (casual, sick, earned, maternity, unpaid, and more) with entitlement rules, accrual rates, and carry-forward limits per department, role, or geography.",
+      },
+      {
+        question: "Can we integrate existing biometric attendance devices?",
+        answer:
+          "Yes. OfficeKit syncs in real time with eSSL and compatible biometric hardware across branches. Punch data flows directly into attendance logs — no manual CSV uploads.",
+      },
+    ],
+  },
+  {
+    id: "pricing",
+    label: "Pricing",
+    faqs: [
+      {
+        question: "What plans does OfficeKit HR offer?",
+        answer:
+          "Three tiers — Silver, Gold, and Platinum — priced per active user per month. Silver covers core HR essentials; Gold adds multi-company, claims, and performance; Platinum includes travel, training, and grievance modules.",
+      },
+      {
+        question: "Is pricing based on the number of employees?",
+        answer:
+          "Yes. Pricing is per active user per month. You only pay for modules you enable — recruitment, payroll, attendance, performance, and more can be switched on as you grow.",
+      },
+      {
+        question: "Is there a free demo available?",
+        answer:
+          "Yes. Book a free demo to see payroll, attendance, and compliance workflows configured for your region — no commitment required.",
+      },
+      {
+        question: "Can we upgrade or downgrade plans as we grow?",
+        answer:
+          "Yes. Start on Silver for core HR and add Gold or Platinum modules — performance, multi-company, travel, training — as your needs expand. You only pay for active users and enabled modules.",
+      },
+    ],
+  },
+  {
+    id: "modules",
+    label: "HR Modules",
+    faqs: [
+      {
+        question: "Does OfficeKit include applicant tracking?",
+        answer:
+          "Yes. Recruiters manage job posts, candidate pipelines, interview scheduling, and offer letters in one ATS. Hired candidates flow directly into onboarding and core HR records.",
+      },
+      {
+        question: "What can employees do in the self-service portal?",
+        answer:
+          "Employees view payslips, apply for leave, check attendance, update profiles, submit HR requests, and access company policies — without waiting on HR for routine tasks.",
+      },
+      {
+        question: "Does OfficeKit support OKRs and performance reviews?",
+        answer:
+          "Yes. Run scheduled appraisal cycles, continuous feedback, and goal tracking aligned to company OKRs. Managers get data-backed review drafts with the AI Review Co-Pilot.",
+      },
+      {
+        question: "Does OfficeKit handle employee exit and full-and-final settlement?",
+        answer:
+          "Yes. Exit workflows cover resignation processing, clearance checklists, asset return, gratuity or leave encashment, and full-and-final settlement calculations tied directly to payroll.",
+      },
+    ],
+  },
+  {
+    id: "ai-mobile",
+    label: "AI & Mobile",
+    faqs: [
+      {
+        question: "What AI features does OfficeKit include?",
+        answer:
+          "AI Pilot helps automate routine HR workflows, draft performance review inputs, and surface actionable insights — so HR teams spend less time on repetitive tasks and more on people decisions.",
+      },
+      {
+        question: "Is there a mobile app for employees and managers?",
+        answer:
+          "Yes. Employees and managers use the OfficeKit mobile app for attendance, leave, payslips, approvals, and announcements — available on iOS and Android.",
+      },
+      {
+        question: "Can managers approve requests on mobile?",
+        answer:
+          "Yes. Leave, attendance regularization, claims, and other approvals can be actioned from the mobile app with push notifications so managers are not tied to a desktop.",
+      },
+      {
+        question: "Does Face Kit work with the mobile app?",
+        answer:
+          "Yes. Face Kit enables touchless facial recognition attendance and works alongside geo-fencing and biometric options for hybrid and multi-site teams.",
+      },
+    ],
+  },
+  {
+    id: "security",
+    label: "Security",
+    faqs: [
+      {
+        question: "How does OfficeKit protect employee data?",
+        answer:
+          "OfficeKit uses encrypted data in transit and at rest, role-based access controls, and audit logs so only authorized users can view or change sensitive HR and payroll information.",
+      },
+      {
+        question: "Is OfficeKit GDPR and compliance ready?",
+        answer:
+          "Yes. Privacy controls, access policies, and data handling practices are designed to support GDPR-aligned operations and regional compliance requirements for India and GCC customers.",
+      },
+      {
+        question: "Can we control who sees salary and payroll data?",
+        answer:
+          "Yes. Granular permissions restrict payroll, compensation, and confidential documents to HR, finance, and other approved roles — managers only see what their role allows.",
+      },
+      {
+        question: "Do you support SSO or enterprise authentication?",
+        answer:
+          "Enterprise deployments can integrate with your identity and access policies. Talk to our team during the demo about SSO and security requirements for your organization.",
       },
     ],
   },
 ];
-
 /** Full FAQ library for /faq — organized by topic, no duplicate product copy. */
 export const FAQ_PAGE_CATEGORIES: HomeFaqCategory[] = [
   {

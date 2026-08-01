@@ -56,6 +56,10 @@ referenced.add("favicon.svg");
 // Always keep homepage reel assets (Cloudflare Pages max file ≈ 25MB)
 referenced.add("bosq-testimonial.mp4");
 referenced.add("bosq-testimonial-poster.jpg");
+// Hero mockups — keep WebP variants even when PNG sources are pruned
+referenced.add("hero-phone-mockup.webp");
+referenced.add("hero-tablet-mockup.webp");
+referenced.add("hero-tablet-mockup-1024.webp");
 
 if (!fs.existsSync(ARCHIVE)) fs.mkdirSync(ARCHIVE, { recursive: true });
 

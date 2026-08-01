@@ -2,6 +2,7 @@ import { Pause, Play, Quote, Star, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { TESTIMONIALS } from "@/data/testimonials-data";
 import type { Testimonial } from "@/data/testimonials-data";
+import { HOME_TESTIMONIALS_INTRO } from "@/data/home-page-content";
 import { TestimonialAvatar } from "@/components/TestimonialAvatar";
 import { FadeUpOnce } from "@/components/motion/FadeUpOnce";
 import {
@@ -292,7 +293,7 @@ function ReelVideoCard({
   return (
     <div
       ref={containerRef}
-      className="feature-card group relative isolate h-full min-h-[420px] w-full overflow-hidden bg-neutral-900 p-0 sm:min-h-[480px]"
+      className="group relative isolate mx-auto aspect-[9/16] h-auto min-h-0 w-full max-h-[min(70vh,28rem)] max-w-sm overflow-hidden rounded-2xl border border-border bg-neutral-900 p-0 lg:mx-0 lg:aspect-[3/4] lg:max-h-[32rem] lg:max-w-none"
     >
       <video
         ref={videoRef}
@@ -456,40 +457,44 @@ const TestimonialsSection = () => {
   const rest = TESTIMONIALS.slice(4);
 
   return (
-    <section className="mb-16 sm:mb-24 lg:mb-mb-common bg-muted/30 py-12 sm:py-16 lg:py-20">
+    <section className="mb-10 bg-muted/30 py-12 sm:mb-14 sm:py-16 lg:mb-16 lg:py-20">
       <div className="container mx-auto px-4">
-        <FadeUpOnce className="mb-10 sm:mb-mb-tursioury text-center">
+        <FadeUpOnce className="mb-8 text-center sm:mb-10">
           <Badge className="mb-4 sm:mb-5 border border-[#ededed] bg-white px-5 py-2.5 text-sm font-medium text-[#1d4ed8] hover:bg-white">
-            Testimonials
+            {HOME_TESTIMONIALS_INTRO.badge}
           </Badge>
 
           <h2 className="mb-3 sm:mb-4 text-3xl font-semibold text-foreground sm:text-4xl lg:mb-5 lg:text-5xl lg:leading-[1.2]">
-            What Our <span className="gradient-text leading-snug">Clients Say</span>
+            What Our{" "}
+            <span className="gradient-text leading-snug">Customers Say</span>
           </h2>
+          <p className="mx-auto mb-3 max-w-3xl text-base sm:text-lg text-muted-foreground">
+            {HOME_TESTIMONIALS_INTRO.intro}
+          </p>
           <p className="mx-auto max-w-2xl text-base sm:text-lg text-muted-foreground">
-            Trusted by 500+ companies across India and the GCC.
+            {HOME_TESTIMONIALS_INTRO.subtitle}
           </p>
         </FadeUpOnce>
 
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch lg:gap-7">
-          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-4 lg:grid-cols-1 lg:gap-7">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-7">
+          <div className="order-2 grid gap-5 sm:grid-cols-2 sm:gap-6 lg:order-none lg:col-span-4 lg:grid-cols-1 lg:gap-7">
             {left.map((testimonial) => (
               <TestimonialCard key={testimonial.name} testimonial={testimonial} />
             ))}
           </div>
 
-          <div className="lg:col-span-4">
+          <div className="order-1 lg:order-none lg:col-span-4">
             <ReelVideoCard />
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-4 lg:grid-cols-1 lg:gap-7">
+          <div className="order-3 grid gap-5 sm:grid-cols-2 sm:gap-6 lg:order-none lg:col-span-4 lg:grid-cols-1 lg:gap-7">
             {right.map((testimonial) => (
               <TestimonialCard key={testimonial.name} testimonial={testimonial} />
             ))}
           </div>
 
           {rest.length > 0 && (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:col-span-12 lg:grid-cols-4 lg:gap-7">
+            <div className="order-4 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:order-none lg:col-span-12 lg:grid-cols-4 lg:gap-7">
               {rest.map((testimonial) => (
                 <TestimonialCard key={testimonial.name} testimonial={testimonial} />
               ))}

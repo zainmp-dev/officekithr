@@ -15,7 +15,7 @@ export const FeatureCard = ({
 }: FeatureCardProps) => {
   return (
     <div
-      className={`bg-card rounded-2xl p-6 shadow-soft card-hover ${className}`}
+      className={`bg-card rounded-2xl p-5 sm:p-6 shadow-soft card-hover ${className}`}
     >
       <div className="flex items-start gap-3 mb-4">
         <div className="flex-shrink-0 text-hr-accent">{icon}</div>

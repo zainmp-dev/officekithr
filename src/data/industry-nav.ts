@@ -10,6 +10,9 @@ import {
   Building2,
   Landmark,
   LayoutGrid,
+  Shirt,
+  Car,
+  Sprout,
   type LucideIcon,
 } from "lucide-react";
 import { INDUSTRY_PAGES } from "@/data/industry-verticals";
@@ -23,10 +26,10 @@ export type IndustryNavLink = {
 
 const navMeta: { slug: string; name: string; icon: LucideIcon; description?: string }[] = [
   {
-    slug: "hrms-for-fintech",
-    name: "Fintech",
-    icon: Coins,
-    description: "Fintech payroll and onboarding.",
+    slug: "hrms-for-manufacturing",
+    name: "Manufacturing",
+    icon: Factory,
+    description: "Factory shifts and compliance.",
   },
   {
     slug: "hrms-for-healthcare",
@@ -35,16 +38,28 @@ const navMeta: { slug: string; name: string; icon: LucideIcon; description?: str
     description: "Staffing and compliance.",
   },
   {
+    slug: "hrms-for-real-estate",
+    name: "Real Estate",
+    icon: Building2,
+    description: "Multi-site workforce HR.",
+  },
+  {
+    slug: "hrms-for-apparel-textile",
+    name: "Apparel & Textile",
+    icon: Shirt,
+    description: "Garment and textile HRMS.",
+  },
+  {
+    slug: "hrms-for-fintech",
+    name: "Fintech",
+    icon: Coins,
+    description: "Fintech payroll and onboarding.",
+  },
+  {
     slug: "hrms-for-it-services",
     name: "IT & Software",
     icon: Laptop,
     description: "IT performance and payroll.",
-  },
-  {
-    slug: "hrms-for-retail",
-    name: "Retail",
-    icon: ShoppingBag,
-    description: "Retail attendance and payroll.",
   },
   {
     slug: "hrms-for-hospitality",
@@ -53,28 +68,34 @@ const navMeta: { slug: string; name: string; icon: LucideIcon; description?: str
     description: "Hospitality shifts and payroll.",
   },
   {
-    slug: "hrms-for-manufacturing",
-    name: "Manufacturing",
-    icon: Factory,
-    description: "Factory shifts and compliance.",
+    slug: "hrms-for-automotive",
+    name: "Automotive",
+    icon: Car,
+    description: "Dealership and service HR.",
+  },
+  {
+    slug: "hrms-for-retail",
+    name: "Retail",
+    icon: ShoppingBag,
+    description: "Retail attendance and payroll.",
+  },
+  {
+    slug: "hrms-for-logistics",
+    name: "Logistics",
+    icon: Truck,
+    description: "Warehouse and logistics HR.",
+  },
+  {
+    slug: "hrms-for-agriculture",
+    name: "Agriculture",
+    icon: Sprout,
+    description: "Agribusiness workforce HR.",
   },
   {
     slug: "hrms-for-education",
     name: "Education",
     icon: GraduationCap,
     description: "Education attendance and payroll.",
-  },
-  {
-    slug: "hrms-for-logistics",
-    name: "Logistics",
-    icon: Truck,
-    description: "Driver shifts and payroll.",
-  },
-  {
-    slug: "hrms-for-real-estate",
-    name: "Real Estate",
-    icon: Building2,
-    description: "Commission payroll and HR.",
   },
   {
     slug: "hrms-for-bfsi",
